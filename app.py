@@ -23,7 +23,8 @@ import requests
 from flask import Flask, request, jsonify, g
 from flask_cors import CORS
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
+from sqlalchemy.orm import sessionmaker
 
 # ─── Config ────────────────────────────────────────────────────────────────────
 BOT_TOKEN      = os.getenv("BOT_TOKEN", "YOUR_BOT_TOKEN_HERE")
@@ -37,7 +38,21 @@ REFERRAL_BONUS = int(os.getenv("REFERRAL_BONUS", 10))  # дней за рефе�
 
 def is_postgres_enabled() -> bool:
     return DATABASE_URL.startswith("postgres://") or DATABASE_URL.startswith("postgresql://")
-  
+
+ENGINE = None
+SessionLocal = None
+
+def setup_database():
+    global ENGINE, SessionLocal
+    if is_postgres_enabled():
+        ENGINE = create_engine(
+            DATABASE_URL.replace("postgres://", "postgresql://", 1),
+            pool_pre_ping=True,
+            future=True,
+        )
+        SessionLocal = sessionmaker(bind=ENGINE, autoflush=False, autocommit=False, future=True)
+
+
 app = Flask(__name__)
 CORS(app, origins="*")
 
@@ -47,19 +62,32 @@ log = logging.getLogger(__name__)
 # ─── Database ──────────────────────────────────────────────────────────────────
 def get_db():
     if "db" not in g:
-        g.db = sqlite3.connect(DATABASE)
-        g.db.row_factory = sqlite3.Row
-        g.db.execute("PRAGMA journal_mode=WAL")
-        g.db.execute("PRAGMA foreign_keys=ON")
+        if is_postgres_enabled():
+            g.db = SessionLocal()
+        else:
+            g.db = sqlite3.connect(DATABASE)
+            g.db.row_factory = sqlite3.Row
+            g.db.execute("PRAGMA journal_mode=WAL")
+            g.db.execute("PRAGMA foreign_keys=ON")
     return g.db
+
 
 @app.teardown_appcontext
 def close_db(exc):
     db = g.pop("db", None)
-    if db:
+    if not db:
+        return
+    try:
         db.close()
+    except Exception:
+        pass
+
 
 def init_db():
+    if is_postgres_enabled():
+        log.info("Postgres mode enabled; schema managed by Alembic migrations.")
+        return
+
     with app.app_context():
         db = get_db()
         db.executescript("""
@@ -84,9 +112,9 @@ def init_db():
                 telegram_id     TEXT,
                 amount_rub      REAL,
                 amount_stars    INTEGER,
-                method          TEXT    NOT NULL,   -- 'yoomoney' | 'stars'
+                method          TEXT    NOT NULL,
                 months          INTEGER NOT NULL,
-                status          TEXT    DEFAULT 'pending',  -- pending|completed|failed
+                status          TEXT    DEFAULT 'pending',
                 payload         TEXT,
                 created_at      INTEGER DEFAULT (strftime('%s','now')),
                 FOREIGN KEY(user_id) REFERENCES users(user_id)
@@ -103,14 +131,15 @@ def init_db():
             CREATE INDEX IF NOT EXISTS idx_payments_user  ON payments(user_id);
         """)
         db.commit()
+
     log.info("Database initialised: %s", DATABASE)
 
 # ─── Helpers ───────────────────────────────────────────────────────────────────
 def user_to_dict(row):
     if row is None:
         return {}
-    d = dict(row)
-    d["trial_used"] = bool(d["trial_used"])
+    d = dict(row) if not isinstance(row, dict) else row
+    d["trial_used"] = bool(d.get("trial_used", False))
     return d
 
 def extend_subscription(db, user_id: str, days: int):
@@ -172,6 +201,34 @@ def require_admin(f):
         return f(*args, **kwargs)
     return wrapper
 
+
+def db_fetchone(db, query, params=()):
+    if is_postgres_enabled():
+        # تبدیل ? به :p0,:p1,...
+        pg_query = query
+        bind = {}
+        for i, v in enumerate(params):
+            key = f"p{i}"
+            pg_query = pg_query.replace("?", f":{key}", 1)
+            bind[key] = v
+        row = db.execute(text(pg_query), bind).mappings().first()
+        return dict(row) if row else None
+    else:
+        row = db.execute(query, params).fetchone()
+        return dict(row) if row else None
+
+def db_execute(db, query, params=()):
+    if is_postgres_enabled():
+        pg_query = query
+        bind = {}
+        for i, v in enumerate(params):
+            key = f"p{i}"
+            pg_query = pg_query.replace("?", f":{key}", 1)
+            bind[key] = v
+        db.execute(text(pg_query), bind)
+    else:
+        db.execute(query, params)
+      
 # ─── API Routes ────────────────────────────────────────────────────────────────
 
 @app.route("/api/user/<user_id>", methods=["GET"])
@@ -536,6 +593,7 @@ def health():
 
 # ─── Run ───────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
+  setup_database()
     init_db()
     port = int(os.getenv("PORT", 5000))
     debug = os.getenv("FLASK_DEBUG", "0") == "1"
