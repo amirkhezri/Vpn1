@@ -59,7 +59,7 @@ const TRANSLATIONS = {
         days_left: "Days left:",
         stars_paid_success: "Stars payment successful! Getting your key...",
         stars_paid_error: "Stars payment failed. Please try again."
-    }
+    },
     fa: {
     tagline: "حریم خصوصی شما اولویت ماست",
     nav_profile: "پروفایل", nav_billing: "پلن‌ها", nav_setup: "آموزش", nav_referral: "دعوت",
@@ -89,7 +89,7 @@ const TRANSLATIONS = {
     days_left: "روز باقی‌مانده:",
     stars_paid_success: "پرداخت Stars موفق بود! در حال دریافت کلید...",
     stars_paid_error: "پرداخت Stars ناموفق بود. دوباره تلاش کنید."
-}
+},
 zh: {
     tagline: "您的隐私是我们的首要任务",
     nav_profile: "个人资料", nav_billing: "套餐", nav_setup: "配置", nav_referral: "邀请",
@@ -290,4 +290,5 @@ const INSTRUCTION_LINKS = {
         `
     }
 };
+
 
