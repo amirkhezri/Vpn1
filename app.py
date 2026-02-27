@@ -380,24 +380,22 @@ def get_user(user_id):
 
 @app.route("/api/user/<user_id>", methods=["POST"])
 def update_user(user_id):
-    db   = get_db()
+    db = get_db()
     data = request.get_json(force=True) or {}
-    now  = int(time.time())
+    now = int(time.time())
 
     # Убедиться что пользователь существует
     db_insert_ignore(
-    db,
-    table="users",
-    columns=["user_id", "telegram_id"],
-    values=[user_id, data.get("telegramId", user_id)],
-    conflict_col="user_id",
-)
-
+        db,
+        table="users",
+        columns=["user_id", "telegram_id"],
+        values=[user_id, data.get("telegramId", user_id)],
+        conflict_col="user_id",
+    )
 
     # ── Активация триала ───────────────────────────────────────────
     if data.get("action") == "activate_trial":
         user = db_fetchone(db, "SELECT * FROM users WHERE user_id=?", (user_id,))
-
         if not user:
             return jsonify({"error": "User not found"}), 404
         if user["trial_used"]:
@@ -409,16 +407,12 @@ def update_user(user_id):
             vless_key = assign_key_from_pool(db, user_id)
 
         new_expiry = now + TRIAL_DAYS * 86400
-
-      db_execute(
-    db,
-    """UPDATE users SET trial_used=1, subscription_expiry=?,
-       vless_key=COALESCE(vless_key, ?), updated_at=? WHERE user_id=?""",
-    (new_expiry, vless_key, now, user_id),
-)
-
-
-
+        db_execute(
+            db,
+            """UPDATE users SET trial_used=1, subscription_expiry=?,
+               vless_key=COALESCE(vless_key, ?), updated_at=? WHERE user_id=?""",
+            (new_expiry, vless_key, now, user_id),
+        )
         db.commit()
 
         # Уведомить пользователя
@@ -437,17 +431,14 @@ def update_user(user_id):
     allowed = {"username", "first_name", "balance"}
     updates = {k: v for k, v in data.items() if k in allowed}
     if updates:
-        sets   = ", ".join(f"{k}=?" for k in updates)
+        sets = ", ".join(f"{k}=?" for k in updates)
         values = list(updates.values()) + [now, user_id]
-        
-      db_execute(db, f"UPDATE users SET {sets}, updated_at=? WHERE user_id=?", tuple(values))
-
+        db_execute(db, f"UPDATE users SET {sets}, updated_at=? WHERE user_id=?", tuple(values))
 
     db.commit()
-    
-row = db_fetchone(db, "SELECT * FROM users WHERE user_id=?", (user_id,))
-
+    row = db_fetchone(db, "SELECT * FROM users WHERE user_id=?", (user_id,))
     return jsonify(user_to_dict(row))
+
 
 
 @app.route("/api/create_stars_invoice", methods=["POST"])
