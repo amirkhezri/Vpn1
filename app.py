@@ -10,6 +10,7 @@ Endpoints:
 """
 
 import os
+import sqlite3
 import hashlib
 import hmac
 import json
@@ -29,8 +30,8 @@ BOT_TOKEN      = os.getenv("BOT_TOKEN", "YOUR_BOT_TOKEN_HERE")
 ADMIN_SECRET   = os.getenv("ADMIN_SECRET", "changeme_admin_secret")
 DATABASE_URL   = os.getenv("DATABASE_URL", "").strip()
 DATABASE       = os.getenv("DATABASE", "shinobu.db")  # fallback برای حالت sqlite
-DB_RESET_MODE  = os.getenv("DB_RESET_MODE", "none").strip().lower()  # none | trial_only | all
-ALLOW_TEST_RESET = os.getenv("ALLOW_TEST_RESET", "false").strip().lower() == "true"
+DB_RESET_MODE  = os.getenv("DB_RESET_MODE", "none").strip().lower()  # none | trial_only | referral_only | full
+RESET_CONFIRM_TOKEN = os.getenv("RESET_CONFIRM_TOKEN", "").strip()
 TRIAL_DAYS     = int(os.getenv("TRIAL_DAYS", 3))
 REFERRAL_BONUS = int(os.getenv("REFERRAL_BONUS", 10))  # дней за реферала
 
