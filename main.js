@@ -191,7 +191,7 @@ window.addEventListener('click', (e) => {
         lockAction(async () => {
             const link = document.getElementById('referral-link-display').textContent;
             if (tg?.openTelegramLink) {
-                tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent('Попробуй Shinobu Proxy! 🔥')}`);
+                tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent('Попробуй Toni vpn! 🔥')}`);
             } else {
                 await copyText(link, TRANSLATIONS[currentLang].link_copied);
             }
@@ -284,7 +284,7 @@ window.showPaymentModal = (months, price, stars) => {
     currentModalTariff = { months, price, stars };
 
     const comment = `Pay_${months}m_${telegramId}`;
-    const yooUrl = `https://yoomoney.ru/quickpay/confirm.xml?receiver=${YOOMONEY_RECIPIENT_ID}&quickpay-form=shop&targets=Shinobu+${months}m&sum=${price.toFixed(2)}&comment=${encodeURIComponent(comment)}&paymentType=AC`;
+    const yooUrl = `https://yoomoney.ru/quickpay/confirm.xml?receiver=${YOOMONEY_RECIPIENT_ID}&quickpay-form=shop&targets=Toni_vpn+${months}m&sum=${price.toFixed(2)}&comment=${encodeURIComponent(comment)}&paymentType=AC`;
 
     const t = TRANSLATIONS[currentLang];
     const mLabel = months === 1 ? t.month_1 : t.month_many;
@@ -547,4 +547,5 @@ window.showToast = (msg, type = 'info', dur = 3000) => {
         toast.addEventListener('transitionend', () => toast.remove(), { once: true });
     }, dur);
 };
+
 
