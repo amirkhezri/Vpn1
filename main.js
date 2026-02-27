@@ -5,9 +5,9 @@ let isProcessing = false;
 let currentModalTariff = null;
 
 const YOOMONEY_RECIPIENT_ID = '4100119271147598';
-const BOT_USERNAME = 'ShinobuProxyBot';
+const BOT_USERNAME = 'Toni_vpn_bot';
 const TRIAL_DAYS = 3;
-let API_BASE = localStorage.getItem('shinobu_api_base') || 'http://127.0.0.1:5000/api';
+let API_BASE = localStorage.getItem('shinobu_api_base') || 'https://toni-vpn.onrender.com/api';
 
 // --- Firebase Mock (API wrapper) ---
 window.firestore = {
@@ -547,3 +547,4 @@ window.showToast = (msg, type = 'info', dur = 3000) => {
         toast.addEventListener('transitionend', () => toast.remove(), { once: true });
     }, dur);
 };
+
