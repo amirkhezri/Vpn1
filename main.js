@@ -1,6 +1,6 @@
 // --- Configuration & State ---
 let tg = null, telegramId = null, userId = null;
-let currentLang = localStorage.getItem('lang') || 'ru';
+let currentLang = localStorage.getItem('lang') || 'en';
 let isProcessing = false;
 let currentModalTariff = null;
 
@@ -115,9 +115,10 @@ window.addEventListener('click', (e) => {
 
     // Language toggle
     if (btn.id === 'lang-toggle-btn') {
-        const langs = ['ru', 'en'];
-        let idx = langs.indexOf(currentLang);
-        currentLang = langs[(idx + 1) % langs.length];
+        const langs = ['en', 'fa', 'ru', 'zh'];
+let idx = langs.indexOf(currentLang);
+if (idx === -1) idx = 0;
+currentLang = langs[(idx + 1) % langs.length];
         updateLanguage(currentLang);
         return;
     }
@@ -547,6 +548,7 @@ window.showToast = (msg, type = 'info', dur = 3000) => {
         toast.addEventListener('transitionend', () => toast.remove(), { once: true });
     }, dur);
 };
+
 
 
 
