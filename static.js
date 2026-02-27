@@ -60,6 +60,66 @@ const TRANSLATIONS = {
         stars_paid_success: "Stars payment successful! Getting your key...",
         stars_paid_error: "Stars payment failed. Please try again."
     }
+    fa: {
+    tagline: "حریم خصوصی شما اولویت ماست",
+    nav_profile: "پروفایل", nav_billing: "پلن‌ها", nav_setup: "آموزش", nav_referral: "دعوت",
+    title_status: "وضعیت شما", balance_label: "موجودی:", status_label: "وضعیت:",
+    expiry_label: "انقضا:", loading: "در حال بارگذاری", loading_key: "کلید پس از فعال‌سازی نمایش داده می‌شود", copy_btn: "کپی",
+    title_trial: "دوره آزمایشی", title_tariffs: "پلن‌ها",
+    billing_subtitle: "یک پلن انتخاب کنید — پرداخت با Telegram Stars ⭐ یا YooMoney",
+    pm_title: "روش‌های پرداخت",
+    payment_warning: "Stars: تحویل فوری کلید. YooMoney: فعال‌سازی حداکثر تا ۵ دقیقه از طریق ربات.",
+    title_referral: "برنامه دعوت", invited_text: "دعوت‌شده‌ها", bonus_days_label: "روزهای پاداش",
+    referral_desc: "لینک دعوت خودت را بفرست. وقتی دوستت اشتراک بخرد، هر دوی شما +۱۰ روز پاداش می‌گیرید.",
+    share_ref_btn: "اشتراک‌گذاری لینک",
+    title_setup: "راه‌اندازی", subtitle_download: "دانلود اپلیکیشن", subtitle_instructions: "راهنما",
+    modal_title: "پرداخت اشتراک",
+    modal_warning: "Stars — تحویل فوری کلید. YooMoney — حداکثر ۵ دقیقه.",
+    modal_pay_btn: "پرداخت با YooMoney", pay_stars_btn: "پرداخت با Stars", modal_close_btn: "بستن",
+    status_active: "فعال", status_inactive: "غیرفعال", status_expired: "منقضی",
+    trial_btn: "فعال‌سازی ۳ روز رایگان", trial_used: "دوره آزمایشی قبلاً استفاده شده",
+    month_1: "ماه", month_few: "ماه", month_many: "ماه",
+    key_label: "کلید شما", key_active: "کلید:", key_inactive: "کلید پس از فعال‌سازی نمایش داده می‌شود",
+    renew_btn: "تمدید اشتراک",
+    processing: "در حال پردازش...",
+    copied: "کپی شد!", link_copied: "لینک کپی شد!",
+    trial_success: "دوره آزمایشی فعال شد!",
+    qr_btn: "QR کد", qr_title: "اسکن کلید", qr_note: "این کد را در اپ استفاده کنید.",
+    save: "محبوب", best: "بهترین قیمت", discount: "تخفیف",
+    days_left: "روز باقی‌مانده:",
+    stars_paid_success: "پرداخت Stars موفق بود! در حال دریافت کلید...",
+    stars_paid_error: "پرداخت Stars ناموفق بود. دوباره تلاش کنید."
+}
+zh: {
+    tagline: "您的隐私是我们的首要任务",
+    nav_profile: "个人资料", nav_billing: "套餐", nav_setup: "配置", nav_referral: "邀请",
+    title_status: "您的状态", balance_label: "余额:", status_label: "状态:",
+    expiry_label: "到期:", loading: "加载中", loading_key: "激活后将显示密钥", copy_btn: "复制",
+    title_trial: "试用期", title_tariffs: "套餐",
+    billing_subtitle: "请选择套餐 — 使用 Telegram Stars ⭐ 或 YooMoney 支付",
+    pm_title: "支付方式",
+    payment_warning: "Stars：即时发放密钥。YooMoney：通过机器人最多 5 分钟激活。",
+    title_referral: "邀请计划", invited_text: "已邀请", bonus_days_label: "奖励天数",
+    referral_desc: "邀请好友。好友购买订阅后，你们双方都可获得 +10 天奖励！",
+    share_ref_btn: "分享链接",
+    title_setup: "连接设置", subtitle_download: "下载应用", subtitle_instructions: "使用说明",
+    modal_title: "订阅支付",
+    modal_warning: "Stars — 即时发放密钥。YooMoney — 最多 5 分钟。",
+    modal_pay_btn: "使用 YooMoney 支付", pay_stars_btn: "使用 Stars 支付", modal_close_btn: "关闭",
+    status_active: "有效", status_inactive: "未激活", status_expired: "已过期",
+    trial_btn: "激活 3 天免费试用", trial_used: "试用已使用",
+    month_1: "月", month_few: "月", month_many: "月",
+    key_label: "您的密钥", key_active: "密钥:", key_inactive: "激活后显示密钥",
+    renew_btn: "续费订阅",
+    processing: "处理中...",
+    copied: "已复制!", link_copied: "链接已复制!",
+    trial_success: "试用已激活!",
+    qr_btn: "二维码", qr_title: "扫描密钥", qr_note: "请在应用中使用此二维码。",
+    save: "热门", best: "最佳价格", discount: "折扣",
+    days_left: "剩余天数:",
+    stars_paid_success: "Stars 支付成功！正在获取密钥...",
+    stars_paid_error: "Stars 支付失败，请重试。"
+}
 };
 
 // --- Tariffs with Stars pricing ---
@@ -230,3 +290,4 @@ const INSTRUCTION_LINKS = {
         `
     }
 };
+
