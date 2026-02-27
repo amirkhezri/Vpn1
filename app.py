@@ -32,7 +32,6 @@ ADMIN_SECRET   = os.getenv("ADMIN_SECRET", "changeme_admin_secret")
 DATABASE_URL   = os.getenv("DATABASE_URL", "").strip()
 DATABASE       = os.getenv("DATABASE", "shinobu.db")  # fallback برای حالت sqlite
 DB_RESET_MODE  = os.getenv("DB_RESET_MODE", "none").strip().lower()  # none | trial_only | referral_only | full
-RESET_CONFIRM_TOKEN = os.getenv("RESET_CONFIRM_TOKEN", "").strip()
 TRIAL_DAYS     = int(os.getenv("TRIAL_DAYS", 3))
 REFERRAL_BONUS = int(os.getenv("REFERRAL_BONUS", 10))  # дней за реферала
 
@@ -228,7 +227,117 @@ def db_execute(db, query, params=()):
         db.execute(text(pg_query), bind)
     else:
         db.execute(query, params)
-      
+
+def db_fetchall(db, query, params=()):
+    if is_postgres_enabled():
+        pg_query = query
+        bind = {}
+        for i, v in enumerate(params):
+            key = f"p{i}"
+            pg_query = pg_query.replace("?", f":{key}", 1)
+            bind[key] = v
+        rows = db.execute(text(pg_query), bind).mappings().all()
+        return [dict(r) for r in rows]
+    else:
+        rows = db.execute(query, params).fetchall()
+        return [dict(r) for r in rows]
+
+
+def apply_reset_mode(db, mode: str):
+    now = int(time.time())
+    result = {"mode": mode, "affected_users": 0, "note": ""}
+
+    if mode == "none":
+        result["note"] = "Reset mode is none; no changes applied."
+        return result
+
+    if mode == "trial_only":
+        target_users = db_fetchall(
+            db,
+            """
+            SELECT u.user_id
+            FROM users u
+            LEFT JOIN payments p
+              ON p.user_id = u.user_id
+             AND p.status = 'completed'
+            WHERE (u.trial_used IS TRUE OR u.trial_used = 1)
+              AND p.id IS NULL
+            """
+        )
+
+        for row in target_users:
+            uid = row["user_id"]
+            db_execute(
+                db,
+                """
+                UPDATE users
+                   SET trial_used = ?, subscription_expiry = ?, vless_key = ?, updated_at = ?
+                 WHERE user_id = ?
+                """,
+                (False, 0, None, now, uid),
+            )
+            db_execute(
+                db,
+                "UPDATE keys_pool SET assigned_to = NULL WHERE assigned_to = ?",
+                (uid,),
+            )
+
+        result["affected_users"] = len(target_users)
+        result["note"] = "Trial-only reset completed."
+        return result
+
+    if mode == "referral_only":
+        count_row = db_fetchone(
+            db,
+            """
+            SELECT COUNT(*) AS c
+            FROM users
+            WHERE referred_by IS NOT NULL OR invited_count > 0
+            """
+        )
+        affected = int((count_row or {}).get("c", 0))
+
+        db_execute(
+            db,
+            """
+            UPDATE users
+               SET referred_by = NULL, invited_count = 0, updated_at = ?
+             WHERE referred_by IS NOT NULL OR invited_count > 0
+            """,
+            (now,),
+        )
+
+        result["affected_users"] = affected
+        result["note"] = "Referral-only reset completed."
+        return result
+
+    if mode == "full":
+        count_row = db_fetchone(db, "SELECT COUNT(*) AS c FROM users")
+        affected = int((count_row or {}).get("c", 0))
+
+        db_execute(db, "DELETE FROM payments")
+        db_execute(db, "UPDATE keys_pool SET assigned_to = NULL")
+        db_execute(
+            db,
+            """
+            UPDATE users
+               SET vless_key = NULL,
+                   subscription_expiry = 0,
+                   trial_used = ?,
+                   referred_by = NULL,
+                   invited_count = 0,
+                   updated_at = ?
+            """,
+            (False, now),
+        )
+
+        result["affected_users"] = affected
+        result["note"] = "Full reset completed (payments cleared, keys unassigned, users reset)."
+        return result
+
+    result["note"] = f"Unknown mode: {mode}"
+    return result
+
 # ─── API Routes ────────────────────────────────────────────────────────────────
 
 @app.route("/api/user/<user_id>", methods=["GET"])
@@ -548,6 +657,28 @@ def admin_add_key():
                 pass
     db.commit()
     return jsonify({"ok": True, "added": added})
+
+
+
+@app.route("/api/admin/reset", methods=["POST"])
+@require_admin
+def admin_reset():
+    """
+    اجرای ریست کنترل‌شده با DB_RESET_MODE.
+    احراز هویت فقط با ADMIN_SECRET انجام می‌شود.
+    """
+    mode = DB_RESET_MODE
+    if mode not in {"none", "trial_only", "referral_only", "full"}:
+        return jsonify({"error": f"Invalid DB_RESET_MODE: {mode}"}), 500
+
+    db = get_db()
+    result = apply_reset_mode(db, mode)
+    db.commit()
+
+    return jsonify({"ok": True, **result})
+
+
+
 
 
 @app.route("/api/admin/users", methods=["GET"])
