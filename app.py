@@ -58,6 +58,9 @@ CORS(app, origins="*")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 log = logging.getLogger(__name__)
 
+setup_database()
+
+
 # ─── Database ──────────────────────────────────────────────────────────────────
 def get_db():
     if "db" not in g:
@@ -566,7 +569,8 @@ def telegram_webhook():
         db.commit()
 
         expiry_row = db_fetchone(db, "SELECT subscription_expiry FROM users WHERE user_id=?", (user_id,))
-expiry = int((expiry_row or {}).get("subscription_expiry") or 0)
+        expiry = int((expiry_row or {}).get("subscription_expiry") or 0)
+
 
         expiry_str = datetime.fromtimestamp(expiry).strftime("%d.%m.%Y")
 
@@ -767,7 +771,7 @@ def health():
 
 # ─── Run ───────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    setup_database()
+    
     init_db()
     port = int(os.getenv("PORT", 5000))
     debug = os.getenv("FLASK_DEBUG", "0") == "1"
