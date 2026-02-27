@@ -593,7 +593,7 @@ def health():
 
 # ─── Run ───────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-  setup_database()
+    setup_database()
     init_db()
     port = int(os.getenv("PORT", 5000))
     debug = os.getenv("FLASK_DEBUG", "0") == "1"
