@@ -630,52 +630,52 @@ expiry = int((expiry_row or {}).get("subscription_expiry") or 0)
 @require_admin
 def admin_set_key():
     """Вручную выдать ключ пользователю (для YooMoney-оплат)."""
-    data      = request.get_json(force=True) or {}
-    user_id   = data.get("user_id")
+    data = request.get_json(force=True) or {}
+    user_id = data.get("user_id")
     vless_key = data.get("vless_key")
-    months    = int(data.get("months", 1))
+    months = int(data.get("months", 1))
 
     if not user_id:
         return jsonify({"error": "user_id required"}), 400
 
     db = get_db()
-    user = db.execute("SELECT * FROM users WHERE user_id=?", (user_id,)).fetchone()
+    user = db_fetchone(db, "SELECT * FROM users WHERE user_id=?", (user_id,))
     if not user:
         return jsonify({"error": "User not found"}), 404
 
-    # Если ключ не передан — взять из пула
     if not vless_key:
         vless_key = assign_key_from_pool(db, user_id)
         if not vless_key:
             return jsonify({"error": "No keys in pool"}), 503
     else:
-        db.execute(
+        db_execute(
+            db,
             "UPDATE users SET vless_key=?, updated_at=? WHERE user_id=?",
-            (vless_key, int(time.time()), user_id)
+            (vless_key, int(time.time()), user_id),
         )
 
     extend_subscription(db, user_id, months * 30)
-    db.execute(
-        "INSERT INTO payments (user_id, telegram_id, method, months, status)"
-        " VALUES (?,?,?,?,?)",
-        (user_id, user["telegram_id"], "yoomoney_manual", months, "completed")
+    db_execute(
+        db,
+        "INSERT INTO payments (user_id, telegram_id, method, months, status) VALUES (?,?,?,?,?)",
+        (user_id, user.get("telegram_id"), "yoomoney_manual", months, "completed"),
     )
     db.commit()
 
-    expiry = db.execute(
-        "SELECT subscription_expiry FROM users WHERE user_id=?", (user_id,)
-    ).fetchone()["subscription_expiry"]
+    expiry_row = db_fetchone(db, "SELECT subscription_expiry FROM users WHERE user_id=?", (user_id,))
+    expiry = int((expiry_row or {}).get("subscription_expiry") or 0)
     expiry_str = datetime.fromtimestamp(expiry).strftime("%d.%m.%Y")
 
-    if user["telegram_id"] and BOT_TOKEN != "YOUR_BOT_TOKEN_HERE":
+    if user.get("telegram_id") and BOT_TOKEN != "YOUR_BOT_TOKEN_HERE":
         send_telegram_message(
             user["telegram_id"],
             f"✅ <b>Подписка активирована!</b>\n\n"
             f"📅 Действует до: <b>{expiry_str}</b>\n\n"
-            f"🔑 Ваш ключ:\n<code>{vless_key}</code>"
+            f"🔑 Ваш ключ:\n<code>{vless_key}</code>",
         )
 
     return jsonify({"ok": True, "vless_key": vless_key, "expiry": expiry_str})
+
 
 
 @app.route("/api/admin/add_key_to_pool", methods=["POST"])
@@ -690,15 +690,24 @@ def admin_add_key():
     db = get_db()
     added = 0
     for k in keys:
-        k = k.strip()
-        if k:
-            try:
-                db.execute("INSERT OR IGNORE INTO keys_pool (vless_key) VALUES (?)", (k,))
-                added += 1
-            except Exception:
-                pass
+        k = (k or "").strip()
+        if not k:
+            continue
+        try:
+            db_insert_ignore(
+                db,
+                table="keys_pool",
+                columns=["vless_key"],
+                values=[k],
+                conflict_col="vless_key",
+            )
+            added += 1
+        except Exception:
+            pass
+
     db.commit()
     return jsonify({"ok": True, "added": added})
+
 
 
 
@@ -726,37 +735,38 @@ def admin_reset():
 @app.route("/api/admin/users", methods=["GET"])
 @require_admin
 def admin_users():
-    db   = get_db()
-    rows = db.execute("SELECT * FROM users ORDER BY created_at DESC").fetchall()
+    db = get_db()
+    rows = db_fetchall(db, "SELECT * FROM users ORDER BY created_at DESC")
     return jsonify([user_to_dict(r) for r in rows])
 
 
 @app.route("/api/admin/payments", methods=["GET"])
 @require_admin
 def admin_payments():
-    db   = get_db()
-    rows = db.execute("SELECT * FROM payments ORDER BY created_at DESC LIMIT 200").fetchall()
-    return jsonify([dict(r) for r in rows])
+    db = get_db()
+    rows = db_fetchall(db, "SELECT * FROM payments ORDER BY created_at DESC LIMIT 200")
+    return jsonify(rows)
 
 
 @app.route("/api/admin/stats", methods=["GET"])
 @require_admin
 def admin_stats():
-    db  = get_db()
+    db = get_db()
     now = int(time.time())
+
+    total_users = db_fetchone(db, "SELECT COUNT(*) AS c FROM users")
+    active_users = db_fetchone(db, "SELECT COUNT(*) AS c FROM users WHERE subscription_expiry > ?", (now,))
+    total_payments = db_fetchone(db, "SELECT COUNT(*) AS c FROM payments WHERE status='completed'")
+    keys_in_pool = db_fetchone(db, "SELECT COUNT(*) AS c FROM keys_pool WHERE assigned_to IS NULL")
+
     stats = {
-        "total_users":   db.execute("SELECT COUNT(*) FROM users").fetchone()[0],
-        "active_users":  db.execute(
-            "SELECT COUNT(*) FROM users WHERE subscription_expiry > ?", (now,)
-        ).fetchone()[0],
-        "total_payments": db.execute(
-            "SELECT COUNT(*) FROM payments WHERE status='completed'"
-        ).fetchone()[0],
-        "keys_in_pool":  db.execute(
-            "SELECT COUNT(*) FROM keys_pool WHERE assigned_to IS NULL"
-        ).fetchone()[0],
+        "total_users": int((total_users or {}).get("c", 0)),
+        "active_users": int((active_users or {}).get("c", 0)),
+        "total_payments": int((total_payments or {}).get("c", 0)),
+        "keys_in_pool": int((keys_in_pool or {}).get("c", 0)),
     }
     return jsonify(stats)
+
 
 
 @app.route("/api/health", methods=["GET"])
