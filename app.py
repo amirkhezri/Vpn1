@@ -1,5 +1,5 @@
 """
-Shinobu Proxy — Flask + SQLite Backend
+Toni VPN — Flask + SQLite Backend
 Endpoints:
   GET  /api/user/<user_id>                — получить данные пользователя
   POST /api/user/<user_id>                — обновить данные / активировать trial
@@ -260,7 +260,7 @@ def create_stars_invoice():
         resp = requests.post(
             f"https://api.telegram.org/bot{BOT_TOKEN}/createInvoiceLink",
             json={
-                "title":          f"Shinobu Proxy — {months} мес.",
+                "title":          f"Toni VPN — {months} мес.",
                 "description":    f"Подписка на VPN на {months} месяц(а). VLESS протокол.",
                 "payload":        payload,
                 "currency":       "XTR",          # Telegram Stars
