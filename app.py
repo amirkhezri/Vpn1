@@ -144,32 +144,40 @@ def user_to_dict(row):
 def extend_subscription(db, user_id: str, days: int):
     """Продлить подписку пользователя на N дней."""
     now = int(time.time())
-    user = db.execute("SELECT subscription_expiry FROM users WHERE user_id=?", (user_id,)).fetchone()
+    user = db_fetchone(db, "SELECT subscription_expiry FROM users WHERE user_id=?", (user_id,))
     if not user:
         return
-    current = max(user["subscription_expiry"] or 0, now)
+
+    current = max(int(user.get("subscription_expiry") or 0), now)
     new_expiry = current + days * 86400
-    db.execute(
+    db_execute(
+        db,
         "UPDATE users SET subscription_expiry=?, updated_at=? WHERE user_id=?",
-        (new_expiry, now, user_id)
+        (new_expiry, now, user_id),
     )
+
 
 def assign_key_from_pool(db, user_id: str) -> str | None:
     """Взять свободный ключ из пула и привязать к пользователю."""
-    row = db.execute(
-        "SELECT id, vless_key FROM keys_pool WHERE assigned_to IS NULL LIMIT 1"
-    ).fetchone()
+    row = db_fetchone(
+        db,
+        "SELECT id, vless_key FROM keys_pool WHERE assigned_to IS NULL ORDER BY id ASC LIMIT 1"
+    )
     if not row:
         return None
-    db.execute(
+
+    db_execute(
+        db,
         "UPDATE keys_pool SET assigned_to=? WHERE id=?",
-        (user_id, row["id"])
+        (user_id, row["id"]),
     )
-    db.execute(
+    db_execute(
+        db,
         "UPDATE users SET vless_key=?, updated_at=? WHERE user_id=?",
-        (row["vless_key"], int(time.time()), user_id)
+        (row["vless_key"], int(time.time()), user_id),
     )
     return row["vless_key"]
+
 
 def send_telegram_message(chat_id, text: str):
     """Отправить сообщение через бота."""
@@ -227,6 +235,18 @@ def db_execute(db, query, params=()):
         db.execute(text(pg_query), bind)
     else:
         db.execute(query, params)
+
+def db_insert_ignore(db, table: str, columns: list[str], values: list, conflict_col: str):
+    cols = ", ".join(columns)
+    placeholders = ", ".join(["?"] * len(values))
+
+    if is_postgres_enabled():
+        query = f"INSERT INTO {table} ({cols}) VALUES ({placeholders}) ON CONFLICT ({conflict_col}) DO NOTHING"
+    else:
+        query = f"INSERT OR IGNORE INTO {table} ({cols}) VALUES ({placeholders})"
+
+    db_execute(db, query, tuple(values))
+
 
 def db_fetchall(db, query, params=()):
     if is_postgres_enabled():
@@ -343,16 +363,19 @@ def apply_reset_mode(db, mode: str):
 @app.route("/api/user/<user_id>", methods=["GET"])
 def get_user(user_id):
     db = get_db()
-    row = db.execute("SELECT * FROM users WHERE user_id=?", (user_id,)).fetchone()
+    row = db_fetchone(db, "SELECT * FROM users WHERE user_id=?", (user_id,))
     if not row:
-        # Создать нового пользователя при первом запросе
-        db.execute(
-            "INSERT OR IGNORE INTO users (user_id, telegram_id) VALUES (?,?)",
-            (user_id, user_id)
+        db_insert_ignore(
+            db,
+            table="users",
+            columns=["user_id", "telegram_id"],
+            values=[user_id, user_id],
+            conflict_col="user_id",
         )
         db.commit()
-        row = db.execute("SELECT * FROM users WHERE user_id=?", (user_id,)).fetchone()
+        row = db_fetchone(db, "SELECT * FROM users WHERE user_id=?", (user_id,))
     return jsonify(user_to_dict(row))
+
 
 
 @app.route("/api/user/<user_id>", methods=["POST"])
@@ -362,14 +385,19 @@ def update_user(user_id):
     now  = int(time.time())
 
     # Убедиться что пользователь существует
-    db.execute(
-        "INSERT OR IGNORE INTO users (user_id, telegram_id) VALUES (?,?)",
-        (user_id, data.get("telegramId", user_id))
-    )
+    db_insert_ignore(
+    db,
+    table="users",
+    columns=["user_id", "telegram_id"],
+    values=[user_id, data.get("telegramId", user_id)],
+    conflict_col="user_id",
+)
+
 
     # ── Активация триала ───────────────────────────────────────────
     if data.get("action") == "activate_trial":
-        user = db.execute("SELECT * FROM users WHERE user_id=?", (user_id,)).fetchone()
+        user = db_fetchone(db, "SELECT * FROM users WHERE user_id=?", (user_id,))
+
         if not user:
             return jsonify({"error": "User not found"}), 404
         if user["trial_used"]:
@@ -381,11 +409,16 @@ def update_user(user_id):
             vless_key = assign_key_from_pool(db, user_id)
 
         new_expiry = now + TRIAL_DAYS * 86400
-        db.execute(
-            """UPDATE users SET trial_used=1, subscription_expiry=?,
-               vless_key=COALESCE(vless_key, ?), updated_at=? WHERE user_id=?""",
-            (new_expiry, vless_key, now, user_id)
-        )
+
+      db_execute(
+    db,
+    """UPDATE users SET trial_used=1, subscription_expiry=?,
+       vless_key=COALESCE(vless_key, ?), updated_at=? WHERE user_id=?""",
+    (new_expiry, vless_key, now, user_id),
+)
+
+
+
         db.commit()
 
         # Уведомить пользователя
@@ -406,10 +439,14 @@ def update_user(user_id):
     if updates:
         sets   = ", ".join(f"{k}=?" for k in updates)
         values = list(updates.values()) + [now, user_id]
-        db.execute(f"UPDATE users SET {sets}, updated_at=? WHERE user_id=?", values)
+        
+      db_execute(db, f"UPDATE users SET {sets}, updated_at=? WHERE user_id=?", tuple(values))
+
 
     db.commit()
-    row = db.execute("SELECT * FROM users WHERE user_id=?", (user_id,)).fetchone()
+    
+row = db_fetchone(db, "SELECT * FROM users WHERE user_id=?", (user_id,))
+
     return jsonify(user_to_dict(row))
 
 
@@ -452,11 +489,13 @@ def create_stars_invoice():
 
         # Записать ожидающий платёж
         db = get_db()
-        db.execute(
-            "INSERT INTO payments (user_id, telegram_id, amount_stars, method, months, status, payload)"
-            " VALUES (?,?,?,?,?,?,?)",
-            (user_id, telegram_id, stars, "stars", months, "pending", payload)
-        )
+        db_execute(
+    db,
+    "INSERT INTO payments (user_id, telegram_id, amount_stars, method, months, status, payload)"
+    " VALUES (?,?,?,?,?,?,?)",
+    (user_id, telegram_id, stars, "stars", months, "pending", payload),
+)
+
         db.commit()
 
         return jsonify({"invoice_link": invoice_link, "payload": payload})
@@ -495,9 +534,12 @@ def telegram_webhook():
         db = get_db()
 
         # Найти платёж по payload
-        pay_row = db.execute(
-            "SELECT * FROM payments WHERE payload=? AND status='pending'", (payload,)
-        ).fetchone()
+        pay_row = db_fetchone(
+    db,
+    "SELECT * FROM payments WHERE payload=? AND status='pending'",
+    (payload,),
+)
+
 
         if not pay_row:
             log.warning("Unknown payload: %s", payload)
@@ -507,12 +549,12 @@ def telegram_webhook():
         months  = pay_row["months"]
 
         # Обновить статус платежа
-        db.execute(
-            "UPDATE payments SET status='completed' WHERE payload=?", (payload,)
-        )
+        db_execute(db, "UPDATE payments SET status='completed' WHERE payload=?", (payload,))
+
 
         # Выдать ключ из пула если нет
-        user = db.execute("SELECT * FROM users WHERE user_id=?", (user_id,)).fetchone()
+        user = db_fetchone(db, "SELECT * FROM users WHERE user_id=?", (user_id,))
+
         vless_key = user["vless_key"] if user else None
         if not vless_key:
             vless_key = assign_key_from_pool(db, user_id)
@@ -526,16 +568,15 @@ def telegram_webhook():
             extend_subscription(db, ref_id, REFERRAL_BONUS)
             extend_subscription(db, user_id, REFERRAL_BONUS)
             # Обновить счётчик рефералов
-            db.execute(
-                "UPDATE users SET invited_count=invited_count+1 WHERE user_id=?", (ref_id,)
-            )
+            db_execute(db, "UPDATE users SET invited_count=invited_count+1 WHERE user_id=?", (ref_id,))
 
-        db.execute("UPDATE users SET updated_at=? WHERE user_id=?", (int(time.time()), user_id))
+        db_execute(db, "UPDATE users SET updated_at=? WHERE user_id=?", (int(time.time()), user_id))
+
         db.commit()
 
-        expiry = db.execute(
-            "SELECT subscription_expiry FROM users WHERE user_id=?", (user_id,)
-        ).fetchone()["subscription_expiry"]
+        expiry_row = db_fetchone(db, "SELECT subscription_expiry FROM users WHERE user_id=?", (user_id,))
+expiry = int((expiry_row or {}).get("subscription_expiry") or 0)
+
         expiry_str = datetime.fromtimestamp(expiry).strftime("%d.%m.%Y")
 
         send_telegram_message(
@@ -559,23 +600,24 @@ def telegram_webhook():
         firstname = from_user.get("first_name", "")
 
         db = get_db()
-        db.execute(
-            """INSERT OR IGNORE INTO users (user_id, telegram_id, username, first_name)
-               VALUES (?,?,?,?)""",
-            (tg_id, tg_id, username, firstname)
-        )
+        db_insert_ignore(
+    db,
+    table="users",
+    columns=["user_id", "telegram_id", "username", "first_name"],
+    values=[tg_id, tg_id, username, firstname],
+    conflict_col="user_id",
+)
+
 
         # Записать реферала
         if len(parts) > 1 and parts[1].startswith("ref_"):
             ref_id = parts[1][4:]
             if ref_id != tg_id:
-                existing = db.execute(
-                    "SELECT referred_by FROM users WHERE user_id=?", (tg_id,)
-                ).fetchone()
+                existing = db_fetchone(db, "SELECT referred_by FROM users WHERE user_id=?", (tg_id,))
+
                 if existing and not existing["referred_by"]:
-                    db.execute(
-                        "UPDATE users SET referred_by=? WHERE user_id=?", (ref_id, tg_id)
-                    )
+                    db_execute(db, "UPDATE users SET referred_by=? WHERE user_id=?", (ref_id, tg_id))
+
 
         db.commit()
 
