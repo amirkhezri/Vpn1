@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Toni VPN v4.0</title>
+    <script src="https://telegram.org/js/telegram-web-app.js?v=2.2"></script>
+    <script src="static.js"></script>
+    <script src="main.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="version-tag">v4.0</div>
+
+    <div class="controls-container">
+        <button class="control-btn" id="lang-toggle-btn" aria-label="Change Language">
+            <span class="lang-text">EN</span>
+        </button>
+    </div>
+
+    <div id="toast-container-box" class="toast-container"></div>
+
+    <!-- Animated background -->
+    <div class="bg-grid"></div>
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="orb orb3"></div>
+    <div class="scanline"></div>
+
+    <div class="container">
+
+        <header>
+            <div class="logo-wrapper">
+                <div class="logo-glyph">忍</div>
+                <div class="logo-text">
+                    <span class="logo-main">ToniVPN</span>
+                    <span class="logo-sub">Pro</span>
+                </div>
+            </div>
+            <div class="tagline" data-i18n="tagline">Ваша приватность — наш приоритет</div>
+        </header>
+
+        <div class="user-info-header">
+            <div class="user-avatar" id="user-avatar-placeholder">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="user-details">
+                <h3 id="user-full-name">Loading...</h3>
+                <p>ID: <span id="telegram-id-display">...</span></p>
+                <p>@<span id="username-display">...</span></p>
+            </div>
+            <div class="user-badge" id="user-status-badge">—</div>
+        </div>
+
+        <nav class="nav-tabs">
+            <button class="nav-btn active" data-target="profile">
+                <i class="fas fa-shield-halved"></i>
+                <span data-i18n="nav_profile">Профиль</span>
+            </button>
+            <button class="nav-btn" data-target="billing">
+                <i class="fas fa-bolt"></i>
+                <span data-i18n="nav_billing">Тарифы</span>
+            </button>
+            <button class="nav-btn" data-target="instructions">
+                <i class="fas fa-mobile-alt"></i>
+                <span data-i18n="nav_setup">Настройка</span>
+            </button>
+            <button class="nav-btn" data-target="referral">
+                <i class="fas fa-users"></i>
+                <span data-i18n="nav_referral">Рефералка</span>
+            </button>
+        </nav>
+
+        <main>
+            <!-- PROFILE TAB -->
+            <section id="profile" class="active">
+                <div class="status-hero-card" id="status-hero">
+                    <div class="status-hero-bg"></div>
+                    <div class="status-hero-content">
+                        <div class="status-hero-top">
+                            <div>
+                                <div class="label-tag" data-i18n="status_label">Статус</div>
+                                <div id="status-indicator" class="status-pill status-inactive" data-i18n="loading">Загрузка</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div class="label-tag" data-i18n="balance_label">Баланс</div>
+                                <div class="balance-display" id="user-balance-display">0,00 ₽</div>
+                            </div>
+                        </div>
+                        <div class="expiry-row">
+                            <i class="fas fa-clock"></i>
+                            <span data-i18n="expiry_label">Истекает:</span>
+                            <span id="expiry-date" class="expiry-val">—</span>
+                        </div>
+                        <div id="days-progress-wrap" style="display:none;">
+                            <div class="days-bar-bg"><div class="days-bar-fill" id="days-bar-fill"></div></div>
+                            <div class="days-bar-label"><span id="days-left-label"></span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="renew-container" style="display:none; margin-bottom: 16px;">
+                    <button class="btn btn-renew nav-btn-proxy" data-target-tab="billing">
+                        <i class="fas fa-sync-alt"></i> <span data-i18n="renew_btn">Продлить подписку</span>
+                    </button>
+                </div>
+
+                <div class="card key-card">
+                    <div class="key-card-header">
+                        <span class="label-tag"><i class="fas fa-key"></i> <span data-i18n="key_label">Ваш ключ</span></span>
+                        <div class="key-actions">
+                            <button class="icon-btn" id="toggle-qr-btn" title="QR-код">
+                                <i class="fas fa-qrcode"></i>
+                            </button>
+                            <button class="icon-btn" id="copy-vless-btn" title="Копировать">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="vless-link-box" id="vless-link-display" data-i18n="loading_key">Загрузка ключа...</div>
+
+                    <div id="qr-code-display" style="display:none; text-align:center; margin-top:16px;">
+                        <div id="qr-code-placeholder"></div>
+                        <p style="margin-top:8px; font-size:0.78em; opacity:0.6;" data-i18n="qr_note">Сканируйте в приложении</p>
+                    </div>
+                </div>
+
+                <div class="card trial-card" id="trial-card-status" style="text-align:center;">Загрузка...</div>
+            </section>
+
+            <!-- BILLING TAB -->
+            <section id="billing">
+                <div class="billing-header">
+                    <h2 class="section-title"><i class="fas fa-bolt"></i> <span data-i18n="title_tariffs">Тарифы</span></h2>
+                    <p class="billing-subtitle" data-i18n="billing_subtitle">Выберите план — оплата через Telegram Stars ⭐</p>
+                </div>
+
+                <div class="tariff-list" id="tariff-grid"></div>
+
+                <div class="payment-methods-card">
+                    <div class="pm-title"><i class="fas fa-lock"></i> <span data-i18n="pm_title">Способы оплаты</span></div>
+                    <div class="pm-icons">
+                        <div class="pm-badge stars"><i class="fas fa-star"></i> Telegram Stars</div>
+                        <div class="pm-badge yoo"><i class="fas fa-ruble-sign"></i> ЮMoney</div>
+                    </div>
+                </div>
+
+                <div class="warning-card">
+                    <i class="fas fa-circle-info"></i>
+                    <span data-i18n="payment_warning">После оплаты Stars ключ выдаётся автоматически. YooMoney — активация до 5 минут через бота.</span>
+                </div>
+            </section>
+
+            <!-- REFERRAL TAB -->
+            <section id="referral">
+                <h2 class="section-title"><i class="fas fa-users"></i> <span data-i18n="title_referral">Рефералка</span></h2>
+
+                <div class="ref-hero-card">
+                    <div class="ref-stats">
+                        <div class="ref-stat">
+                            <div class="ref-stat-num" id="invited-count-num">0</div>
+                            <div class="ref-stat-label" data-i18n="invited_text">Приглашено</div>
+                        </div>
+                        <div class="ref-stat-divider"></div>
+                        <div class="ref-stat">
+                            <div class="ref-stat-num" id="ref-bonus-days">0</div>
+                            <div class="ref-stat-label" data-i18n="bonus_days_label">Бонус дней</div>
+                        </div>
+                    </div>
+                    <p class="ref-desc" id="referral-desc-text" data-i18n="referral_desc">
+                        Приглашай друзей — вы ОБА получите +10 дней подписки!
+                    </p>
+                    <button class="btn btn-primary btn-full" id="copy-referral-btn">
+                        <i class="fas fa-share-nodes"></i> <span data-i18n="share_ref_btn">Поделиться ссылкой</span>
+                    </button>
+                    <div class="ref-link-box" id="referral-link-display">...</div>
+                </div>
+            </section>
+
+            <!-- SETUP TAB -->
+            <section id="instructions">
+                <h2 class="section-title"><i class="fas fa-mobile-alt"></i> <span data-i18n="title_setup">Настройка</span></h2>
+
+                <h3 class="section-title-h3">
+                    <i class="fas fa-download"></i> <span data-i18n="subtitle_download">Скачать приложение</span>
+                </h3>
+                <div class="download-grid" id="download-grid"></div>
+
+                <h3 class="section-title-h3" style="margin-top:28px;">
+                    <i class="fas fa-book-open"></i> <span data-i18n="subtitle_instructions">Инструкции</span>
+                </h3>
+                <div id="instructions-grid"></div>
+            </section>
+        </main>
+    </div>
+
+    <!-- PAYMENT MODAL -->
+    <div id="payment-modal">
+        <div class="modal-card" id="payment-modal-content">
+            <div class="modal-header">
+                <div class="modal-icon"><i class="fas fa-credit-card"></i></div>
+                <h3 data-i18n="modal_title">Оплата подписки</h3>
+                <button class="modal-close-x" id="close-modal-btn"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="modal-tariff-info" class="modal-info"></div>
+
+            <div class="modal-pay-buttons">
+                <button class="btn btn-stars" id="pay-stars-btn">
+                    <i class="fas fa-star"></i> <span data-i18n="pay_stars_btn">Оплатить Stars</span>
+                    <span class="stars-badge" id="stars-badge-amount">0 ⭐</span>
+                </button>
+                <button class="btn btn-crypto" id="open-crypto-btn">
+                    <i class="fas fa-coins"></i> <span data-i18n="pay_crypto_btn">Pay with Crypto</span>
+                </button>
+            </div>
+
+            <div class="warning-card" style="margin-top:14px; font-size:0.82em;">
+                <i class="fas fa-circle-info"></i>
+                <span data-i18n="modal_warning">Stars — мгновенная выдача. ЮMoney — до 5 минут.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- CRYPTO PAYMENT OVERLAY -->
+
+
+    <div id="crypto-overlay" style="display:none;">
+
+        <title>Crypto Payment</title>
+
+        <style>
+
+            :root{
+            
+             --bg:#0f172a;
+            
+             --card:#1e293b;
+            
+             --muted:#94a3b8;
+            
+             --accent:#3b82f6;
+            
+             --green:#22c55e;
+            
+             --red:#ef4444;
+            
+             --warn:#f59e0b;
+            
+            }
+            
+            #crypto-overlay{margin:0;background:var(--bg);font-family:sans-serif;color:#fff}
+            
+            #crypto-overlay .overlay{
+            
+             position:fixed;inset:0;
+            
+             background:rgba(0,0,0,.6);
+            
+             backdrop-filter:blur(6px);
+            
+             display:flex;justify-content:center;align-items:center;
+            
+            }
+            
+            #crypto-overlay .modal{
+            
+             width:95%;max-width:420px;
+            
+             max-height:90vh;
+            
+             overflow-y:auto;
+            
+             background:var(--card);
+            
+             border-radius:16px;
+            
+             padding:16px;
+            
+             position:relative;
+            
+            }
+            
+            #crypto-overlay .close{position:absolute;right:12px;top:10px;font-size:20px;cursor:pointer}
+            
+            /* TIMER */
+            
+            #crypto-overlay .timer-bar{height:8px;background:#334155;border-radius:6px;overflow:hidden}
+            
+            #crypto-overlay .timer-fill{height:100%;background:var(--green);width:100%;transition:1s linear}
+            
+            #crypto-overlay .timer-text{text-align:center;margin-top:4px;font-size:12px}
+            
+            /* SECTION */
+            
+            #crypto-overlay .section{margin-top:12px}
+            
+            #crypto-overlay .label{font-size:12px;color:var(--muted);margin-bottom:6px}
+            
+            /* CURRENCIES */
+            
+            #crypto-overlay .grid{display:flex;flex-wrap:wrap;gap:6px}
+            
+            #crypto-overlay .card{
+            
+             flex:1 1 48%;
+            
+             display:flex;align-items:center;gap:8px;
+            
+             padding:8px;background:#334155;
+            
+             border-radius:10px;cursor:pointer;
+            
+            }
+            
+            #crypto-overlay .card.active{background:var(--accent)}
+            
+            #crypto-overlay .card img{width:20px;height:20px}
+            
+            /* NETWORKS (FIXED UI) */
+            
+            #crypto-overlay .networks{
+            
+             display:flex;
+            
+             flex-wrap:wrap;
+            
+             gap:6px;
+            
+            }
+            
+            #crypto-overlay .net{
+            
+             display:flex;
+            
+             align-items:center;
+            
+             gap:6px;
+            
+             padding:6px 10px;
+            
+             background:#334155;
+            
+             border-radius:999px;
+            
+             cursor:pointer;
+            
+             font-size:12px;
+            
+             white-space:nowrap;
+            
+            }
+            
+            #crypto-overlay .net.active{
+            
+             outline:2px solid var(--accent);
+            
+            }
+            
+            #crypto-overlay .net .dot{
+            
+             width:10px;height:10px;border-radius:50%;
+            
+            }
+            
+            /* BOX */
+            
+            #crypto-overlay .box{
+            
+             display:flex;justify-content:space-between;
+            
+             align-items:center;
+            
+             background:#0b1324;
+            
+             padding:10px;
+            
+             border-radius:8px;
+            
+             gap:10px;
+                
+            
+            }
+            
+            #crypto-overlay .addr{
+            
+             flex:1;
+            
+             min-width:0;           /* مهم */
+            
+             word-break:break-all;
+            
+             font-size:14px;
+            
+            }
+                
+            
+            #crypto-overlay .icon{
+            
+             width:18px;
+            
+             height:18px;
+            
+             cursor:pointer;
+            
+             flex-shrink:0;   /* ⭐ جلوگیری از جمع شدن */
+            
+            }
+            
+            /* QR */
+            
+            #crypto-overlay .qr{text-align:center;margin:10px 0;}
+            
+            #crypto-overlay .qr img{width:120px;}
+            
+            /* Yellow status */
+            
+            #crypto-overlay .status{
+            
+            background:var(--warn);
+            
+            padding:10px;
+            
+            border-radius:10px;
+            
+            margin-top:10px;
+            
+            display:flex;
+            
+            flex-direction:column;
+            
+            gap:6px;
+            
+            }
+            
+            #crypto-overlay .status-row{
+            
+            display:flex;
+            
+            justify-content:space-between;
+            
+            align-items:center;
+            
+            }
+            
+            #crypto-overlay .status-left{
+            
+            display:flex;align-items:center;gap:8px;
+            
+            }
+            
+            #crypto-overlay .spinner{
+            
+            width:16px;height:16px;
+            
+            border:2px solid rgba(255,255,255,.4);
+            
+            border-top:2px solid #fff;
+            
+            border-radius:50%;
+            
+            animation:spin 1s linear infinite;
+            
+            }
+            
+            @keyframes spin{to{transform:rotate(360deg)}}
+            
+            /* DOTS */
+            
+            #crypto-overlay .dots{display:inline-flex}
+            
+            #crypto-overlay .dots span{
+            
+            opacity:0;
+            
+            animation:blink 1.2s infinite;
+            
+            }
+            
+            #crypto-overlay .dots span:nth-child(2){animation-delay:.2s}
+            
+            #crypto-overlay .dots span:nth-child(3){animation-delay:.4s}
+            
+            @keyframes blink{
+            
+            0%,80%,100%{opacity:0}
+            
+            40%{opacity:1}
+            
+            }
+            
+            /* RIGHT */
+            
+            #crypto-overlay .status-right{
+            
+            display:flex;align-items:center;gap:6px;
+            
+            font-size:15px;color:var(--red);
+            
+            }
+            
+            /* HOURGLASS */
+            
+            #crypto-overlay .hourglass{
+            
+            width:16px;height:16px;
+            
+            animation:flip 1s infinite;
+            
+            }
+            
+            @keyframes flip{
+            
+            0%{transform:rotateX(0)}
+            
+            100%{transform:rotateX(180deg)}
+            
+            }
+            
+            #crypto-overlay .hourglass path{
+            
+            fill:none;
+            
+            stroke:var(--red);
+            
+            stroke-width:2;
+            
+            }
+            
+            /* STATUS TEXT */
+            
+            #crypto-overlay .status-note{
+            
+            font-size:12px;
+            
+            color:rgba(255,255,255,0.8);
+            
+            line-height:1.4;
+            
+            text-align:center;
+            
+            }
+            
+            /* TXID */
+            
+            #crypto-overlay .tx-label{font-size:12px;color:var(--muted);margin-top:10px;}
+            
+            #crypto-overlay .tx-box{
+            
+              margin-top:5px;
+            
+              padding:8px;
+            
+              border-radius:8px;
+            
+              background:#0b1324;
+            
+            }
+            
+            #crypto-overlay .skeleton{
+            
+             height:16px;border-radius:6px;
+            
+             background:linear-gradient(90deg,#1e293b,#334155,#1e293b);
+            
+             background-size:200%;
+            
+             animation:load 1.5s infinite;
+            
+            }
+            
+            @keyframes load{
+            
+             0%{background-position:200%}
+            
+             100%{background-position:-200%}
+            
+            }
+            
+            
+            #crypto-overlay .tx-timer{
+            
+            font-size:12px;
+            
+            color:var(--muted);
+            
+            margin-top:4px;
+            
+            text-align:right;
+            
+            }
+            
+            
+            /* CANCEL */
+            
+            #crypto-overlay .cancel-btn{
+            
+            margin-top:12px;padding:8px 16px;
+            
+            border-radius:8px;border:1px solid #334155;
+            
+            background:transparent;color:var(--muted);
+            
+            cursor:pointer;display:block;margin-inline:auto;
+            
+            }
+            
+            /* CONFIRM MODAL */
+            
+            #crypto-overlay .confirm{
+            
+            position:fixed;inset:0;
+            
+            background:rgba(0,0,0,.6);
+            
+            display:none;
+            
+            justify-content:center;
+            
+            align-items:center;
+            
+            }
+            
+            #crypto-overlay .confirm-box{
+            
+            background:var(--card);
+            
+            padding:16px;
+            
+            border-radius:12px;
+            
+            width:90%;max-width:300px;
+            
+            text-align:center;
+            
+            }
+            
+            #crypto-overlay .confirm-buttons{
+            
+            display:flex;gap:8px;margin-top:12px;
+            
+            }
+            
+            #crypto-overlay .btn{
+            
+            flex:1;padding:8px;border-radius:8px;border:none;cursor:pointer;
+            
+            }
+            
+            #crypto-overlay .btn-exit{background:var(--red);color:#fff}
+            
+            #crypto-overlay .btn-stay{background:#334155;color:#fff}
+            
+            
+            /* EXP */
+            
+            #crypto-overlay .expired{text-align:center;padding:20px;}
+            
+            #crypto-overlay .refresh-btn{
+            
+             width:100%;margin-top:15px;padding:12px;
+            
+             border:none;border-radius:10px;
+            
+             background:var(--accent);color:#fff;
+            
+             display:flex;justify-content:center;gap:8px;
+            
+             cursor:pointer;
+            
+            }
+            
+            </style>
+
+        <div class="overlay">
+
+            <div class="modal">
+            
+            <div class="close" onclick="askClose()">✕</div>
+            
+            <h3 style="text-align:center">Crypto Payment</h3>
+            
+            <div class="timer-bar">
+            
+            <div class="timer-fill" id="fill"></div>
+            
+            </div>
+            
+            <div class="timer-text" id="topTimer">15:00</div>
+            
+            <div id="content">
+            
+            <!-- CURRENCY -->
+            
+            <div class="section">
+            
+            <div class="label">Select currency</div>
+            
+            <div class="grid" id="currencies"></div>
+            
+            </div>
+            
+            <!-- AMOUNT -->
+            
+            <div class="section">
+            
+            <div class="label">Amount</div>
+            
+            <div class="box">
+            
+            <span id="amount"></span>
+            
+            <svg class="icon" onclick="copyAmount()" id="copyAmount" viewBox="0 0 24 24" fill="white">
+            
+            <path d="M16 1H4v12h2V3h10V1zm3 4H8v14h11V5z"/>
+            
+            </svg>
+            
+            </div>
+            
+            </div>
+            
+            <!-- NETWORK -->
+            
+            <div class="section">
+            
+            <div class="label">Select network</div>
+            
+            <div class="networks" id="networks"></div>
+            
+            </div>
+            
+            <!-- ADDRESS -->
+            
+            <div class="section">
+            
+            <div class="label">Recipient's wallet address</div>
+            
+            <div class="box">
+            
+            <span id="address" class="addr"></span>
+            
+            <svg class="icon" onclick="copyAddress()" id="copyAddr" viewBox="0 0 24 24" fill="white">
+            
+            <path d="M16 1H4v12h2V3h10V1zm3 4H8v14h11V5z"/>
+            
+            </svg>
+            
+            </div>
+            
+            </div>
+            
+            <div class="qr">
+            
+            <img id="qr">
+            
+            </div>
+            
+            
+            <!-- Status + Timer -->
+            
+            <div class="status">
+            
+            <div class="status-row">
+              
+            <div class="status-left">
+              
+            <div class="spinner"></div>
+              
+            <span>Checking payment</span>
+              
+            <div class="dots"><span>.</span><span>.</span><span>.</span></div>
+              
+            </div>
+              
+            <div class="status-right">
+              
+            <svg class="hourglass" viewBox="0 0 24 24">
+              
+            <path d="M6 2h12v2c0 2.5-2 4.5-4 6 2 1.5 4 3.5 4 6v2H6v-2c0-2.5 2-4.5 4-6-2-1.5-4-3.5-4-6V2z"/>
+              
+            </svg>
+              
+            <span id="mainTimer">15:00</span>
+              
+            </div>
+              
+            </div>
+              
+            <div class="status-note">
+              
+            Your payment will be confirmed automatically after the required network confirmations.
+              
+            </div>
+              
+            </div>
+            
+            <!-- TXID -->
+            
+            <div class="tx-label">Transaction Hash (TXID)</div>
+            
+            <div class="tx-box">
+            
+            <div class="skeleton"></div>
+            
+            <div class="tx-timer">Next check in: <span id="txTimer">30</span>s</div>
+            
+            </div>
+            
+            <!-- CANCEL -->
+            
+            <div class="section">
+            
+            <button class="cancel-btn" onclick="askClose()">Cancel</button></div>
+            
+            </div>
+            
+            
+            
+            <div class="confirm" id="confirmBox">
+              
+            <div class="confirm-box">
+                
+            <p>Are you sure you want to exit the payment page?</p>
+                
+            <div class="confirm-buttons">
+                
+            <button class="btn btn-exit" onclick="forceClose()">Exit</button>
+                
+            <button class="btn btn-stay" onclick="stay()">Stay</button>
+                
+            </div>
+                
+            </div>
+                
+            </div>
+            
+            
+            <!-- EXPIRED -->
+            
+            <div id="expired" style="display:none" class="expired">
+            
+            <h3 style="color:var(--red)">Payment expired</h3>
+            
+            <p style="color:var(--muted)">Please try again</p>
+            
+            <button class="refresh-btn" onclick="resetAll()">Trying again</button></div>
+            
+            </div>
+            
+            </div>
+            
+            
+            <script>
+            
+            /* DATA */
+            
+            const data={
+            
+            USDT:{amount:25,icon:"https://cryptologos.cc/logos/tether-usdt-logo.png",
+            
+            nets:{
+            
+            BEP20:{addr:"0xbc4e762Be74B045faE22EEA47c31a264BC55AC21",color:"#f59e0b"},
+            
+            TON:{addr:"UQCPgPZit_QwvbxXCbb62IpIZkDn20k1F3o4tmfyLq0vpQAA",color:"#38bdf8"},
+            
+            TRC20:{addr:"TL9SKdR14YEMP2uPbZDK97jHcxHhpBWMDf",color:"#ff2200"},
+            
+            ERC20:{addr:"0xbc4e762Be74B045faE22EEA47c31a264BC55AC21",color:"#c6c6c6"},
+            
+            POLYGON:{addr:"0xbc4e762Be74B045faE22EEA47c31a264BC55AC21",color:"#a855f7"}
+            
+            }},
+            
+            Toncoin:{amount:10,icon:"https://cryptologos.cc/logos/toncoin-ton-logo.png",
+            
+            nets:{
+            
+            TON:{addr:"UQCPgPZit_QwvbxXCbb62IpIZkDn20k1F3o4tmfyLq0vpQAA",color:"#38bdf8"}
+            
+            }}
+            
+            };
+            
+            let cur="USDT";
+            
+            let net="BEP20";
+            
+            
+            /* CURRENCIES */
+            
+            function renderCurrencies(){
+            
+            let c=document.getElementById("currencies");
+            
+            c.innerHTML="";
+            
+            Object.keys(data).forEach(k=>{
+            
+            let el=document.createElement("div");
+            
+            el.className="card"+(k===cur?" active":"");
+            
+            el.innerHTML=`
+            
+            <img src="${data[k].icon}"/>
+            
+            <span>${k}</span>
+            
+            `;
+            
+            el.onclick=()=>{
+            
+            cur=k;
+            
+            net=Object.keys(data[cur].nets)[0];
+            
+            renderCurrencies();
+            
+            renderNetworks();
+            
+            };
+            
+            c.appendChild(el);
+            
+            });
+            
+            }
+            
+            /* NETWORKS FIXED UI */
+            
+            function renderNetworks(){
+            
+            let c=document.getElementById("networks");
+            
+            c.innerHTML="";
+            
+            Object.keys(data[cur].nets).forEach(k=>{
+            
+            let n=data[cur].nets[k];
+            
+            let el=document.createElement("div");
+            
+            el.className="net"+(k===net?" active":"");
+            
+            el.innerHTML=`
+            
+            <div class="dot" style="background:${n.color}"></div>
+            
+            <span>${k}</span>
+            
+            `;
+            
+            el.onclick=()=>{
+            
+            net=k;
+            
+            renderNetworks();
+            
+            update();
+            
+            };
+            
+            c.appendChild(el);
+            
+            });
+            
+            update();
+            
+            }
+            
+            /* UPDATE */
+            
+            function update(){
+            
+            let addr=data[cur].nets[net].addr;
+            
+            document.getElementById("amount").innerText=data[cur].amount+" "+cur;
+            
+            document.getElementById("address").innerText=addr;
+            
+            document.getElementById("qr").src=`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${addr}`;
+            
+            }
+            
+            /* COPY FIX (ROBUST) */
+            
+            async function copyText(text,btnId){
+            
+            try{
+            
+            await navigator.clipboard.writeText(text);
+            
+            }catch(e){
+            
+            let t=document.createElement("textarea");
+            
+            t.value=text;
+            
+            document.body.appendChild(t);
+            
+            t.select();
+            
+            document.execCommand("copy");
+            
+            document.body.removeChild(t);
+            
+            }
+            
+            /* UI feedback */
+            
+            let icon=document.getElementById(btnId);
+            
+            icon.innerHTML=`<path d="M20 6L9 17l-5-5"/>`;
+            
+            setTimeout(()=>{
+            
+            icon.innerHTML=`<path d="M16 1H4v12h2V3h10V1zm3 4H8v14h11V5z"/>`;
+            
+            },1200);
+            
+            }
+            
+            function copyAmount(){
+            
+            copyText(data[cur].amount.toString(),"copyAmount");
+            
+            }
+            
+            function copyAddress(){
+            
+            copyText(document.getElementById("address").innerText,"copyAddr");
+            
+            }
+            
+            /* TIMER */
+            
+            let t=900;
+            
+            setInterval(()=>{
+            
+            if(t<=0)return;
+            
+            t--;
+            
+            let m=Math.floor(t/60),s=t%60;
+            
+            document.getElementById("mainTimer").innerText=`${m}:${s<10?"0":""}${s}`;
+            
+            document.getElementById("topTimer").innerText=`${m}:${s<10?"0":""}${s}`;
+            
+            document.getElementById("fill").style.width=(t/900*100)+"%";
+            
+            if(t<=0){
+            
+            let fill =
+            
+            document.getElementById("fill");
+            
+            fill.style.width = "100%";
+            
+            fill.style.background = "var(--red)";
+            
+            fill.style.transition = "width 0.5s ease, background 0.3s ease";
+            
+            document.getElementById("topTimer").innerText = "00:00";
+            
+            document.getElementById("content").style.display="none";
+            
+            document.getElementById("expired").style.display="block";
+            
+            }
+            
+            
+            },1000);
+            
+            
+            /* TXID 30s loop */
+            
+            let tx=30;
+            
+            setInterval(()=>{
+            
+            tx--;
+            
+            if(tx<=0) tx=30;
+            
+            document.getElementById("txTimer").innerText=tx;
+            
+            },1000);
+            
+            /* RESET */
+            
+            function resetAll(){
+            
+            t=900;
+            
+            let fill =
+            
+            document.getElementById("fill");
+            
+            fill.style.width = "100%";
+            
+            fill.style.background = "var(--green)";
+            
+            fill.style.transition = "1s linear";
+            
+            document.getElementById("topTimer").innerText = "15:00";
+            
+            document.getElementById("expired").style.display="none";
+            
+            document.getElementById("content").style.display="block";
+            
+            }
+            
+            
+            
+            /* CONFIRM LOGIC */
+            
+            function askClose(){
+            
+            document.getElementById("confirmBox").style.display="flex";
+            
+            }
+            
+            function stay(){
+            
+            document.getElementById("confirmBox").style.display="none";
+            
+            }
+            
+            function forceClose(){
+            
+            document.getElementById("confirmBox").style.display="none";
+            
+            document.getElementById("crypto-overlay").style.display="none";
+            
+            }
+            
+            
+            /* INIT */
+            
+            renderCurrencies();
+            
+            renderNetworks();
+            
+            
+            </script>
+
+    </div>
+
+</body>
+</html>
+
+
+
+
