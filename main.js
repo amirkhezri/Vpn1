@@ -462,17 +462,6 @@ window.startSubscriptionListener = async function () {
 
     const handleSnapshot = (docSnap) => {
         const data = docSnap.data();
-
-        const avatarImg = document.getElementById('user-avatar-img');
-        const avatarInitials = document.getElementById('user-avatar-initials');
-        avatarInitials.textContent = initials || '?';
-          if (data.photo_url && avatarImg) {
-                    if (avatarImg.src !== data.photo_url) {
-                    avatarImg.src = data.photo_url + '?t=' + Data.now();
-                    }
-                    avatarImg.style.display = 'block';
-                    avatarInitials.style.display = 'none';
-                }
         
         const t = TRANSLATIONS[currentLang];
 
