@@ -83,16 +83,8 @@ window.addEventListener('load', () => {
         userUsername  = user.username   || 'None';
 
         const initials = (userFirstName[0] + (userLastName ? userLastName[0] : '')).toUpperCase().trim();
-        const avatarImg = document.getElementById('user-avatar-img');
-        const avatarInitials = document.getElementById('user-avatar-initials');
-        avatarInitials.textContent = initials || '?';
-          if (data.photo_url && avatarImg) {
-                    if (avatarImg.src !== data.photo_url) {
-                    avatarImg.src = data.photo_url + '?t=' + Data.now();
-                    }
-                    avatarImg.style.display = 'block';
-                    avatarInitials.style.display = 'none';
-                }
+        const avatarEl = document.getElementById('user-avatar-placeholder');
+        
     }
 
     document.getElementById('telegram-id-display').textContent = telegramId;
@@ -463,6 +455,17 @@ window.startSubscriptionListener = async function () {
     
     const handleSnapshot = (docSnap) => {
         const data = docSnap.data();
+
+        const avatarImg = document.getElementById('user-avatar-img');
+        const avatarInitials = document.getElementById('user-avatar-initials');
+        avatarInitials.textContent = initials || '?';
+          if (data.photo_url && avatarImg) {
+                    if (avatarImg.src !== data.photo_url) {
+                    avatarImg.src = data.photo_url + '?t=' + Data.now();
+                    }
+                    avatarImg.style.display = 'block';
+                    avatarInitials.style.display = 'none';
+                }
         
         const t = TRANSLATIONS[currentLang];
 
