@@ -83,10 +83,9 @@ window.addEventListener('load', () => {
         userUsername  = user.username   || 'None';
 
         const initials = (userFirstName[0] + (userLastName ? userLastName[0] : '')).toUpperCase().trim();
-        const avatarEl = document.getElementById('user-avatar-placeholder');
         
     }
-
+    document.getElementById('user-avatar-placeholder');
     document.getElementById('telegram-id-display').textContent = telegramId;
     document.getElementById('user-full-name').textContent = `${userFirstName} ${userLastName}`.trim();
     document.getElementById('username-display').textContent = userUsername;
