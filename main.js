@@ -83,24 +83,7 @@ window.addEventListener('load', () => {
         userUsername  = user.username   || 'None';
 
         const initials = (userFirstName[0] + (userLastName ? userLastName[0] : '')).toUpperCase().trim();
-        const avatarImg = document.getElementById('user-avatar-img');
-        const avatarInitials = document.getElementById('user-avatar-initials');
-        // DIFALT CARECTER
         avatarInitials.textContent = initials || '?';
-        // GET PHOTO OF API
-        (async () => {
-            try {
-                if (data.photo_url) {
-                    avatarImg.src = data.photo_url;
-                    avatarImg.style.display = 'block';
-                    avatarInitials.style.display = 'none';
-                }}
-            
-            catch (e) {
-                console.log(' Avatar load failed');
-            }
-        })();
-
     }
 
     document.getElementById('telegram-id-display').textContent = telegramId;
@@ -470,6 +453,17 @@ window.startSubscriptionListener = async function () {
 
     const handleSnapshot = (docSnap) => {
         const data = docSnap.data();
+
+        const avatarImg = document.getElementById('user-avatar-img');
+        const avatarInitials = document.getElementById('user-avatar-initials');
+        if (data.photo_url && avatarImg) {
+                    if (avatarImg.src !== data.photo_url) {
+                    avatarImg.src = data.photo_url + '?t=' + Data.now();
+                    }
+                    avatarImg.style.display = 'block';
+                    avatarInitials.style.display = 'none';
+                }
+        
         const t = TRANSLATIONS[currentLang];
 
         const balance = data.balance ? parseFloat(data.balance).toFixed(2) : '0.00';
