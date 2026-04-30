@@ -83,9 +83,9 @@ window.addEventListener('load', () => {
         userUsername  = user.username   || 'None';
 
         const initials = (userFirstName[0] + (userLastName ? userLastName[0] : '')).toUpperCase().trim();
-        
+        avatarInitials.textContent = initials || '?';
     }
-    document.getElementById('user-avatar-placeholder');
+    document.getElementById('user-avatar-placeholder')
     document.getElementById('telegram-id-display').textContent = telegramId;
     document.getElementById('user-full-name').textContent = `${userFirstName} ${userLastName}`.trim();
     document.getElementById('username-display').textContent = userUsername;
@@ -450,14 +450,12 @@ window.startSubscriptionListener = async function () {
     const daysLeftLabel = document.getElementById('days-left-label');
     const expiryEl      = document.getElementById('expiry-date');
     const balanceEl     = document.getElementById('user-balance-display');
-    const avatarEl = document.getElementById('user-avatar-placeholder');
     
     const handleSnapshot = (docSnap) => {
         const data = docSnap.data();
 
         const avatarImg = document.getElementById('user-avatar-img');
         const avatarInitials = document.getElementById('user-avatar-initials');
-        avatarInitials.textContent = initials || '?';
           if (data.photo_url && avatarImg) {
                     if (avatarImg.src !== data.photo_url) {
                     avatarImg.src = data.photo_url + '?t=' + Data.now();
