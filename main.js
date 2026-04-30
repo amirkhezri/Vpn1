@@ -82,9 +82,6 @@ window.addEventListener('load', () => {
         userLastName  = user.last_name  || '';
         userUsername  = user.username   || 'None';
 
-        const initials = (userFirstName[0] + (userLastName ? userLastName[0] : '')).toUpperCase().trim();
-        avatarInitials.textContent = initials || '?';
-
     }
 
     document.getElementById('telegram-id-display').textContent = telegramId;
@@ -457,13 +454,24 @@ window.startSubscriptionListener = async function () {
 
         const avatarImg = document.getElementById('user-avatar-img');
         const avatarInitials = document.getElementById('user-avatar-initials');
-          if (data.photo_url && avatarImg) {
-                    if (avatarImg.src !== data.photo_url) {
-                    avatarImg.src = data.photo_url + '?t=' + Data.now();
-                    }
-                    avatarImg.style.display = 'block';
-                    avatarInitials.style.display = 'none';
-                }
+
+        // fallback initials (از Telegram)
+        const initials = (
+            (tg?.initDataUnsafe?.user?.first_name?.[0] || '') +
+            (tg?.initDataUnsafe?.user?.last_name?.[0] || '')
+        ).toUpperCase() || '?';
+
+        if (data.photo_url && avatarImg && avatarInitials) {
+            if (avatarImg.src !== data.photo_url) {
+                avatarImg.src = data.photo_url + '?t=' + Date.now(); // cache-bust
+            }
+            avatarImg.style.display = 'block';
+            avatarInitials.style.display = 'none';
+        } else if (avatarInitials) {
+            avatarInitials.textContent = initials;
+            avatarInitials.style.display = 'flex';
+            if (avatarImg) avatarImg.style.display = 'none';
+        }
         
         const t = TRANSLATIONS[currentLang];
 
