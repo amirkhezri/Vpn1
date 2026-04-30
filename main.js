@@ -83,6 +83,16 @@ window.addEventListener('load', () => {
         userUsername  = user.username   || 'None';
 
         const initials = (userFirstName[0] + (userLastName ? userLastName[0] : '')).toUpperCase().trim();
+        const avatarImg = document.getElementById('user-avatar-img');
+        const avatarInitials = document.getElementById('user-avatar-initials');
+        avatarInitials.textContent = initials || '?';
+          if (data.photo_url && avatarImg) {
+                    if (avatarImg.src !== data.photo_url) {
+                    avatarImg.src = data.photo_url + '?t=' + Data.now();
+                    }
+                    avatarImg.style.display = 'block';
+                    avatarInitials.style.display = 'none';
+                }
     }
 
     document.getElementById('telegram-id-display').textContent = telegramId;
