@@ -455,16 +455,18 @@ window.startSubscriptionListener = async function () {
         const avatarImg = document.getElementById('user-avatar-img');
         const avatarInitials = document.getElementById('user-avatar-initials');
 
-        // fallback initials (از Telegram)
         const initials = (
             (tg?.initDataUnsafe?.user?.first_name?.[0] || '') +
             (tg?.initDataUnsafe?.user?.last_name?.[0] || '')
         ).toUpperCase() || '?';
 
         if (data.photo_url && avatarImg && avatarInitials) {
-            if (avatarImg.src !== data.photo_url) {
-                avatarImg.src = data.photo_url + '?t=' + Date.now(); // cache-bust
+            // فقط اگر واقعا تغییر کرده
+            if (avatarImg.dataset.src !== data.photo_url) {
+                avatarImg.src = data.photo_url;
+                avatarImg.dataset.src = data.photo_url;
             }
+
             avatarImg.style.display = 'block';
             avatarInitials.style.display = 'none';
         } else if (avatarInitials) {
