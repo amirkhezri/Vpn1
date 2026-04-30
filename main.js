@@ -459,7 +459,8 @@ window.startSubscriptionListener = async function () {
     const daysLeftLabel = document.getElementById('days-left-label');
     const expiryEl      = document.getElementById('expiry-date');
     const balanceEl     = document.getElementById('user-balance-display');
-
+    const avatarEl = document.getElementById('user-avatar-placeholder');
+    
     const handleSnapshot = (docSnap) => {
         const data = docSnap.data();
         
