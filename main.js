@@ -476,15 +476,39 @@ window.startSubscriptionListener = async function () {
         const avatarImg = document.getElementById('user-avatar-img');
         const avatarInitials = document.getElementById('user-avatar-initials');
 
-        if (data.photo_url && avatarImg && avatarInitials) {
-            // فقط اگر واقعا تغییر کرده
-            if (avatarImg.dataset.src !== data.photo_url) {
-                avatarImg.src = data.photo_url;
-                avatarImg.dataset.src = data.photo_url;
-            }
+        const photoUrl = data.photo_url?.trim(); // مهم برای null/empty
+        const hasPhoto = !!photoUrl;
 
-            avatarImg.style.display = 'block';
-            avatarInitials.style.display = 'none';
+        // initials fallback
+        const initials = (
+            (tg?.initDataUnsafe?.user?.first_name?.[0] || '') +
+            (tg?.initDataUnsafe?.user?.last_name?.[0] || '')
+            ).toUpperCase() || '?';
+
+            if (avatarImg && avatarInitials) {
+
+            // ✅ CASE 1: user has photo
+            if (hasPhoto) {
+
+                // update only if changed
+                if (avatarImg.dataset.src !== photoUrl) {
+                    avatarImg.src = photoUrl;
+                    avatarImg.dataset.src = photoUrl;
+                }
+
+                avatarImg.style.display = 'block';
+                avatarInitials.style.display = 'none';
+
+            } 
+            // ❌ CASE 2: user removed photo → IMPORTANT FIX
+            else {
+                avatarImg.src = '';              // پاک کردن تصویر قبلی
+                avatarImg.dataset.src = '';      // پاک کردن cache داخلی
+                avatarImg.style.display = 'none';
+
+                avatarInitials.textContent = initials;
+                avatarInitials.style.display = 'flex';
+            }
         }
         
         const t = TRANSLATIONS[currentLang];
