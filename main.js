@@ -475,8 +475,8 @@ window.startSubscriptionListener = async function () {
 
         const avatarImg = document.getElementById('user-avatar-img');
         const avatarInitials = document.getElementById('user-avatar-initials');
-
-        const photoUrl = data.photo_url?.trim(); // مهم برای null/empty
+        
+        
         const hasPhoto = !!photoUrl;
 
         // initials fallback
