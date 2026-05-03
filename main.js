@@ -483,7 +483,7 @@ window.startSubscriptionListener = async function () {
         const initials = (
             (tg?.initDataUnsafe?.user?.first_name?.[0] || '') +
             (tg?.initDataUnsafe?.user?.last_name?.[0] || '')
-        ).toUpperCase() || '';
+        ).toUpperCase() || 'felex';
 
         if (avatarImg && avatarInitials && avatarContainer) {
 
