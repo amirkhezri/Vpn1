@@ -90,31 +90,17 @@ window.addEventListener('load', () => {
         const initials = (
             (tgUser?.first_name?.[0] || '') +
             (tgUser?.last_name?.[0] || '')
-        ).toUpperCase() || '?';
+            ).toUpperCase() || '?';
 
-        // 👇 مهم: همیشه اول حالت loading-like
-        avatarImg.style.opacity = '0.3';
-        avatarInitials.style.opacity = '0.3';
-
-        if (tgUser?.photo_url) {
-
-            const img = new Image();
-
-            img.onload = () => {
-                avatarImg.src = tgUser.photo_url;
-                avatarImg.style.display = 'block';
-                avatarInitials.style.display = 'none';
-
-                avatarImg.style.opacity = '1';
-            };
-
-            img.src = tgUser.photo_url;
-
-        } else {
+        // ✅ نمایش فوری (بدون تاخیر)
+        if (tgUser?.photo_url && avatarImg && avatarInitials) {
+            avatarImg.src = tgUser.photo_url;
+            avatarImg.dataset.src = tgUser.photo_url; // خیلی مهم
+            avatarImg.style.display = 'block';
+            avatarInitials.style.display = 'none';
+        } else if (avatarInitials) {
             avatarInitials.textContent = initials;
             avatarInitials.style.display = 'flex';
-
-            avatarInitials.style.opacity = '1';
         }
 
     }
@@ -486,6 +472,38 @@ window.startSubscriptionListener = async function () {
     
     const handleSnapshot = (docSnap) => {
         const data = docSnap.data();
+
+        const avatarImg = document.getElementById('user-avatar-img');
+        const avatarInitials = document.getElementById('user-avatar-initials');
+
+        const tgUser = tg?.initDataUnsafe?.user;
+        const photoUrl = data.photo_url?.trim(); // مهم برای null/empty
+        const hasPhoto = !!photoUrl;
+
+        // initials fallback
+        const initials = (
+            (tg?.initDataUnsafe?.user?.first_name?.[0] || '') +
+            (tg?.initDataUnsafe?.user?.last_name?.[0] || '')
+        ).toUpperCase() || '?';
+
+        if (avatarImg && avatarInitials) {
+
+            // ✅ CASE 1: user has photo
+            if (hasPhoto) {
+
+                // update only if changed
+                if (avatarImg.dataset.src !== photoUrl) {
+                    avatarImg.src = photoUrl;
+                    avatarImg.dataset.src = photoUrl;
+                }
+
+                avatarImg.style.display = 'block';
+                avatarInitials.style.display = 'none';
+
+            } 
+            // ❌ CASE 2: user removed photo → IMPORTANT FIX
+            
+        }
         
         const t = TRANSLATIONS[currentLang];
 
