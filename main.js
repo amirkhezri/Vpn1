@@ -475,41 +475,42 @@ window.startSubscriptionListener = async function () {
 
         const avatarImg = document.getElementById('user-avatar-img');
         const avatarInitials = document.getElementById('user-avatar-initials');
+        const avatarContainer = document.getElementById('user-avatar-placeholder');
 
-        const photoUrl = data.photo_url?.trim(); // مهم برای null/empty
+        const photoUrl = data.photo_url?.trim();
         const hasPhoto = !!photoUrl;
 
-        // initials fallback
         const initials = (
             (tg?.initDataUnsafe?.user?.first_name?.[0] || '') +
             (tg?.initDataUnsafe?.user?.last_name?.[0] || '')
         ).toUpperCase() || '?';
 
-        if (avatarImg && avatarInitials) {
+        if (avatarImg && avatarInitials && avatarContainer) {
 
-                    // ✅ CASE 1: user has photo
-                    if (hasPhoto) {
-
-                        // update only if changed
-                        if (avatarImg.dataset.src !== photoUrl) {
-                            avatarImg.src = photoUrl;
-                            avatarImg.dataset.src = photoUrl;
-                        }
-
-                        avatarImg.style.display = 'block';
-                        avatarInitials.style.display = 'none';
-
-                    } 
-                    // ❌ CASE 2: user removed photo → IMPORTANT FIX
-                    else {
-                        avatarImg.src = '';              // پاک کردن تصویر قبلی
-                        avatarImg.dataset.src = '';      // پاک کردن cache داخلی
-                        avatarImg.style.display = 'none';
-
-                        avatarInitials.textContent = initials;
-                        
-                    }
+            if (hasPhoto) {
+                if (avatarImg.dataset.src !== photoUrl) {
+                    avatarImg.src = photoUrl;
+                    avatarImg.dataset.src = photoUrl;
                 }
+
+                avatarImg.style.display = 'block';
+                avatarInitials.style.display = 'none';
+
+                avatarContainer.classList.add('has-photo');
+                avatarContainer.classList.remove('no-photo');
+
+            } else {
+                avatarImg.src = '';
+                avatarImg.dataset.src = '';
+                avatarImg.style.display = 'none';
+
+                avatarInitials.textContent = initials;
+                avatarInitials.style.display = 'flex';
+
+                avatarContainer.classList.remove('has-photo');
+                avatarContainer.classList.add('no-photo');
+            }
+        }
         
         const t = TRANSLATIONS[currentLang];
 
