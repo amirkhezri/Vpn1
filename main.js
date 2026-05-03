@@ -500,7 +500,7 @@ window.startSubscriptionListener = async function () {
                 avatarImg.style.display = 'block';
                 avatarInitials.style.display = 'none';
 
-            } 
+            }  
             // ❌ CASE 2: user removed photo → IMPORTANT FIX
         }
         
