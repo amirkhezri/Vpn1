@@ -487,10 +487,9 @@ window.startSubscriptionListener = async function () {
 
         if (avatarImg && avatarInitials) {
 
-            // ✅ CASE 1: user has photo
+            // ✅ فقط وقتی عکس هست دخالت کن
             if (hasPhoto) {
 
-                // update only if changed
                 if (avatarImg.dataset.src !== photoUrl) {
                     avatarImg.src = photoUrl;
                     avatarImg.dataset.src = photoUrl;
@@ -498,16 +497,20 @@ window.startSubscriptionListener = async function () {
 
                 avatarImg.style.display = 'block';
                 avatarInitials.style.display = 'none';
+            }
 
-            } 
-            // ❌ CASE 2: user removed photo → IMPORTANT FIX
-            else {
-                avatarImg.src = '';              // پاک کردن تصویر قبلی
-                avatarImg.dataset.src = '';      // پاک کردن cache داخلی
+            // ❗️ وقتی عکس نیست → هیچ تغییری نده
+            // فقط اگر قبلاً عکس بوده پاکش کن
+            else if (avatarImg.style.display !== 'none') {
+
+                avatarImg.src = '';
+                avatarImg.dataset.src = '';
                 avatarImg.style.display = 'none';
 
+                // فقط متن رو ست کن، استایل رو دست نزن
                 avatarInitials.textContent = initials;
-                avatarInitials.style.display = 'flex';
+
+                // ❗️ هیچ display یا کلاس نزن
             }
         }
         
