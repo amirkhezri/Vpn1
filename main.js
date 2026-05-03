@@ -502,14 +502,7 @@ window.startSubscriptionListener = async function () {
 
             } 
             // ❌ CASE 2: user removed photo → IMPORTANT FIX
-            else {
-                avatarImg.src = '';              // پاک کردن تصویر قبلی
-                avatarImg.dataset.src = '';      // پاک کردن cache داخلی
-                avatarImg.style.display = 'none';
-
-                avatarInitials.textContent = initials;
-                avatarInitials.style.display = 'flex';
-            }
+            
         }
         
         const t = TRANSLATIONS[currentLang];
