@@ -134,6 +134,7 @@ header { text-align: center; padding: 48px 10px 28px; animation: fadeDown 0.7s e
     display: none;
     width: 100%;
     height: 100%;
+    object-fit:cover;
     border-radius: 50%;
     align-items: center;
     justify-content: center;
