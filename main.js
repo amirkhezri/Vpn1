@@ -502,14 +502,6 @@ window.startSubscriptionListener = async function () {
 
             } 
             // ❌ CASE 2: user removed photo → IMPORTANT FIX
-            else {
-                avatarImg.src = '';
-                avatarImg.dataset.src = '';
-                avatarImg.style.display = 'none';
-
-                avatarInitials.textContent = initials;
-                avatarInitials.style.display = 'flex';
-            }
         }
         
         const t = TRANSLATIONS[currentLang];
