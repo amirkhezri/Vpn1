@@ -507,7 +507,7 @@ window.startSubscriptionListener = async function () {
                 avatarImg.style.display = 'none';
 
                 avatarInitials.textContent = initials;
-                avatarInitials.style.display = 'block';
+                avatarInitials.style.display = 'none';
             }
         }
         
