@@ -124,7 +124,7 @@ header { text-align: center; padding: 48px 10px 28px; animation: fadeDown 0.7s e
 }
 .user-avatar {
     width: 56px; height: 56px; flex-shrink: 0;
-    border-radius: 50% ;
+    border-radius: var(--btn-radius);              /* квадратный */
     background: linear-gradient(135deg, var(--purple), var(--accent));
     display: flex; align-items: center; justify-content: center;
     font-size: 1.5em; font-weight: 700; color: #fff;
