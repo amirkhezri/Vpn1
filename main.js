@@ -475,7 +475,7 @@ window.startSubscriptionListener = async function () {
 
         const avatarImg = document.getElementById('user-avatar-img');
         const avatarInitials = document.getElementById('user-avatar-initials');
-        
+
         const photoUrl = data.photo_url?.trim(); // مهم برای null/empty
         const hasPhoto = !!photoUrl;
 
@@ -483,36 +483,33 @@ window.startSubscriptionListener = async function () {
         const initials = (
             (tg?.initDataUnsafe?.user?.first_name?.[0] || '') +
             (tg?.initDataUnsafe?.user?.last_name?.[0] || '')
-            ).toUpperCase() || '?';
+        ).toUpperCase() || '?';
 
-            if (avatarImg && avatarInitials) {
+        if (avatarImg && avatarInitials) {
 
-                if (hasPhoto) {
+            // ✅ CASE 1: user has photo
+            if (hasPhoto) {
 
-                    if (avatarImg.dataset.src !== photoUrl) {
-                        avatarImg.src = photoUrl;
-                        avatarImg.dataset.src = photoUrl;
-                    }
-
-                    avatarImg.style.display = 'block';
-                    avatarInitials.style.display = 'none';
-
-                    // 🔥 حذف حالت no-photo
-                    avatarImg.parentElement.classList.remove('no-photo');
-
-                } else {
-
-                    avatarImg.src = '';
-                    avatarImg.dataset.src = '';
-                    avatarImg.style.display = 'none';
-
-                    avatarInitials.textContent = initials;
-                    avatarInitials.style.display = 'block';
-
-                    // 🔥 اضافه کردن حالت تلگرام
-                    avatarImg.parentElement.classList.add('no-photo');
+                // update only if changed
+                if (avatarImg.dataset.src !== photoUrl) {
+                    avatarImg.src = photoUrl;
+                    avatarImg.dataset.src = photoUrl;
                 }
+
+                avatarImg.style.display = 'block';
+                avatarInitials.style.display = 'none';
+
+            } 
+            // ❌ CASE 2: user removed photo → IMPORTANT FIX
+            else {
+                avatarImg.src = '';              // پاک کردن تصویر قبلی
+                avatarImg.dataset.src = '';      // پاک کردن cache داخلی
+                avatarImg.style.display = 'none';
+
+                avatarInitials.textContent = initials;
+                avatarInitials.style.display = 'none';
             }
+        }
         
         const t = TRANSLATIONS[currentLang];
 
