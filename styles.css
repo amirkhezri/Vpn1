@@ -145,15 +145,12 @@ header { text-align: center; padding: 48px 10px 28px; animation: fadeDown 0.7s e
     position: absolute;
     inset: 0;
     display: flex;
-    width: 100%;
-    height: 100%;
     border-radius: 50%;
     align-items: center;
     justify-content: center;
     font-size: 1.5em;
     font-weight: 700;
     color: #fff;
-    text-transform: uppercase;
 }
 .user-details { flex: 1; min-width: 0; }
 .user-details h3 { font-size: 1em; font-weight: 700; color: #fff; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
