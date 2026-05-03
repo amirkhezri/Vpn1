@@ -487,29 +487,32 @@ window.startSubscriptionListener = async function () {
 
             if (avatarImg && avatarInitials) {
 
-            // ✅ CASE 1: user has photo
-            if (hasPhoto) {
+                if (hasPhoto) {
 
-                // update only if changed
-                if (avatarImg.dataset.src !== photoUrl) {
-                    avatarImg.src = photoUrl;
-                    avatarImg.dataset.src = photoUrl;
+                    if (avatarImg.dataset.src !== photoUrl) {
+                        avatarImg.src = photoUrl;
+                        avatarImg.dataset.src = photoUrl;
+                    }
+
+                    avatarImg.style.display = 'block';
+                    avatarInitials.style.display = 'none';
+
+                    // 🔥 حذف حالت no-photo
+                    avatarImg.parentElement.classList.remove('no-photo');
+
+                } else {
+
+                    avatarImg.src = '';
+                    avatarImg.dataset.src = '';
+                    avatarImg.style.display = 'none';
+
+                    avatarInitials.textContent = initials;
+                    avatarInitials.style.display = 'block';
+
+                    // 🔥 اضافه کردن حالت تلگرام
+                    avatarImg.parentElement.classList.add('no-photo');
                 }
-
-                avatarImg.style.display = 'block';
-                avatarInitials.style.display = 'none';
-
-            } 
-            // ❌ CASE 2: user removed photo → IMPORTANT FIX
-            else {
-                avatarImg.src = '';              // پاک کردن تصویر قبلی
-                avatarImg.dataset.src = '';      // پاک کردن cache داخلی
-                avatarImg.style.display = 'none';
-
-                avatarInitials.textContent = initials;
-                avatarInitials.style.display = 'block';
             }
-        }
         
         const t = TRANSLATIONS[currentLang];
 
