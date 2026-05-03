@@ -123,12 +123,16 @@ header { text-align: center; padding: 48px 10px 28px; animation: fadeDown 0.7s e
     animation: fadeUp 0.6s ease 0.1s both;
 }
 .user-avatar {
-    width: 56px; height: 56px; flex-shrink: 0;
-    border-radius: var(--btn-radius);              /* квадратный */
-    background: linear-gradient(135deg, var(--purple), var(--accent));
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.5em; font-weight: 700; color: #fff;
-    box-shadow: 0 0 20px rgba(0,212,255,0.2);
+    width: 56px;
+    height: 56px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #fff;
+    overflow: hidden;
 }
 .user-avatar.has-photo {
     background: none;
@@ -137,10 +141,8 @@ header { text-align: center; padding: 48px 10px 28px; animation: fadeDown 0.7s e
 
 .user-avatar.no-photo {
     /* شبیه تلگرام */
-    object-fit:cover;
-    border-radius: 50% ;
-    background: none;
-    box-shadow: none;
+    background: linear-gradient(135deg, #6a85f1, #7b2cbf);
+    font-size: 18px;
 }
 .user-details { flex: 1; min-width: 0; }
 .user-details h3 { font-size: 1em; font-weight: 700; color: #fff; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
