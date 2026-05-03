@@ -124,20 +124,33 @@ header { text-align: center; padding: 48px 10px 28px; animation: fadeDown 0.7s e
 }
 .user-avatar {
     width: 56px; height: 56px; flex-shrink: 0;
+    position: relative; /* :fire: مهم */
     border-radius: 50% ;
     background: linear-gradient(135deg, var(--purple), var(--accent));
     display: flex; align-items: center; justify-content: center;
     font-size: 1.5em; font-weight: 700; color: #fff;
     box-shadow: 0 0 20px rgba(0,212,255,0.2);
+    overflow: hidden; /* :fire: مهم */
+}
+#user-avatar-img {
+    position: absolute;
+    inset: 0;
+    display: none;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
 }
 #user-avatar-initials {
-    display: none;
+    position: absolute;
+    inset: 0;
+    display: flex;
     width: 100%;
     height: 100%;
     border-radius: 50%;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 1.5em;
     font-weight: 700;
     color: #fff;
     text-transform: uppercase;
