@@ -155,9 +155,16 @@ currentLang = langs[(idx + 1) % langs.length];
 
     
     if (btn.id === 'open-crypto-btn') {
-        closeModal();//بستن مودال قبلی
+        closeModal();
         resetAll();
-        document.getElementById("crypto-overlay").style.display = "flex";
+    
+        if (!currentModalTariff) return;
+    
+        const { price } = currentModalTariff;
+    
+        // ✅ پاس دادن دیتا به crypto
+        window.openCryptoPayment(price, telegramId);
+    
         return;
     }
 
