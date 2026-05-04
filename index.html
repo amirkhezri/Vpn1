@@ -698,6 +698,16 @@
             <div class="close" onclick="askClose()">✕</div>
             
             <h3 style="text-align:center; padding:20px;">Crypto Payment</h3>
+
+            <div id="payment-info-box" style="
+                background:#0b1324;
+                padding:12px;
+                border-radius:10px;
+                margin-bottom:12px;
+                font-size:13px;
+                line-height:1.5;
+                ">
+            </div>
             
             <div class="timer-bar">
             
@@ -872,11 +882,21 @@
             
             <script>
             
+            // ✅ CRYPTO GLOBAL STATE
+            let CRYPTO_STATE = {
+                priceUSD: 0,
+                telegramId: null,
+                rates: null,
+                paymentId: null
+            };
+
+            
+
             /* DATA */
             
             const data={
             
-            USDT:{amount:25,icon:"https://cryptologos.cc/logos/tether-usdt-logo.png",
+            USDT:{amount:25, icon:"https://cryptologos.cc/logos/tether-usdt-logo.png",
             
             nets:{
             
@@ -905,6 +925,64 @@
             let cur="USDT";
             
             let net="BEP20";
+
+            window.openCryptoPayment = async function(price, telegramId) {
+
+                CRYPTO_STATE.priceUSD = price;
+                CRYPTO_STATE.telegramId = telegramId;
+
+                // ساخت payment id
+                const random = Math.floor(100000000000 + Math.random() * 900000000000);
+                CRYPTO_STATE.paymentId = telegramId + "-" + random;
+
+                // نمایش overlay
+                document.getElementById("crypto-overlay").style.display = "flex";
+
+                // گرفتن نرخ واقعی
+                await loadRates();
+
+                // رندر مجدد
+                renderCurrencies();
+                renderNetworks();
+
+            };
+            
+            
+            async function loadRates() {
+                try {
+                    const res = await fetch(
+                        "https://api.coingecko.com/api/v3/simple/price?ids=toncoin,tether&vs_currencies=usd"
+                        );
+                        const data = await res.json();
+
+                        CRYPTO_STATE.rates = {
+                            USDT: data.tether.usd,
+                            Toncoin: data.toncoin.usd
+                        };
+
+                    } catch (e) {
+                        console.error("Rate fetch failed", e);
+
+                // fallback
+                CRYPTO_STATE.rates = {
+                    USDT: 1,
+                    Toncoin: 5
+                };
+            }
+            }
+
+            const NETWORK_FEES = {
+                USDT: {
+                    BEP20: 0.3,
+                    TON: 0.2,
+                    TRC20: 1,
+                    ERC20: 5,
+                    POLYGON: 0.1
+                },
+                Toncoin: {
+                    TON: 0.05
+                }
+            };
             
             
             /* CURRENCIES */
@@ -993,14 +1071,33 @@
             
             function update(){
             
-            let addr=data[cur].nets[net].addr;
-            
-            document.getElementById("amount").innerText=data[cur].amount+" "+cur;
-            
-            document.getElementById("address").innerText=addr;
-            
-            document.getElementById("qr").src=`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${addr}`;
-            
+                if (!CRYPTO_STATE.rates) return;
+  
+                let coinPrice = CRYPTO_STATE.rates[cur];
+                let baseAmount = CRYPTO_STATE.priceUSD / coinPrice;
+                let fee = (NETWORK_FEES[cur] && NETWORK_FEES[cur][net]) ? NETWORK_FEES[cur][net] : 0;
+  
+                let finalAmount = (baseAmount + fee).toFixed(4);
+  
+                document.getElementById("amount").innerText = finalAmount + " " + cur;
+
+
+                let addr=data[cur].nets[net].addr;
+                
+                document.getElementById("address").innerText=addr;
+
+                document.getElementById("qr").src=`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${addr}`;
+
+
+                // ✅ info box
+                let infoBox = document.getElementById("payment-info-box");
+  
+                if (infoBox && CRYPTO_STATE.telegramId) {
+                    infoBox.innerHTML =
+                    "You are paying <b>" + finalAmount + " " + cur + "</b><br>" +
+                    "on network <b>" + net + "</b> to Toni VPN<br><br>" +
+                    "Payment ID:<br><b>" + CRYPTO_STATE.paymentId + "</b>";
+                }
             }
             
             /* COPY FIX (ROBUST) */
