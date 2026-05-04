@@ -312,7 +312,7 @@ window.showPaymentModal = (months, price, stars) => {
 
     document.getElementById('modal-tariff-info').innerHTML = `
         <div class="modal-info-row"><span>Срок</span><strong>${months} ${mLabel}</strong></div>
-        <div class="modal-info-row"><span>Цена ЮMoney</span><strong>${price.toFixed(0)} ₽</strong></div>
+        <div class="modal-info-row"><span>Цена ЮMoney</span><strong>${price.toFixed(0)} $</strong></div>
         <div class="modal-info-row"><span>Цена Stars</span><strong>⭐ ${stars}</strong></div>
         <div class="modal-info-row"><span>ID</span><strong>${telegramId}</strong></div>
     `;
@@ -403,7 +403,7 @@ function renderTariffs() {
             ? `<span class="tariff-discount">−${tariff.discountPct}%</span>`
             : '';
         const oldPrice = tariff.months > 1
-            ? `<span class="tariff-old-price">${(basePrice1m * tariff.months).toFixed(0)} ₽</span>`
+            ? `<span class="tariff-old-price">${(basePrice1m * tariff.months).toFixed(0)} $</span>`
             : '';
 
         return `
@@ -416,8 +416,8 @@ function renderTariffs() {
             </div>
             <div class="tariff-price-block">
                 ${oldPrice}
-                <div class="tariff-price">${tariff.price.toFixed(0)} <span class="tariff-currency">₽</span></div>
-                <div class="tariff-per-month">${pricePerMonth} ₽/мес</div>
+                <div class="tariff-price">${tariff.price.toFixed(0)} <span class="tariff-currency">$</span></div>
+                <div class="tariff-per-month">${pricePerMonth} $/мес</div>
                 <div class="tariff-stars-price">⭐ ${tariff.stars} Stars</div>
             </div>
             <ul class="tariff-features">
@@ -500,14 +500,15 @@ window.startSubscriptionListener = async function () {
                 avatarImg.style.display = 'block';
                 avatarInitials.style.display = 'none';
 
-            }  
+            } 
             // ❌ CASE 2: user removed photo → IMPORTANT FIX
+            
         }
         
         const t = TRANSLATIONS[currentLang];
 
         const balance = data.balance ? parseFloat(data.balance).toFixed(2) : '0.00';
-        balanceEl.textContent = `${balance} ₽`;
+        balanceEl.textContent = `${balance} $`;
 
         const expiryTime = Number(data.subscription_expiry) * 1000;
         const now = Date.now();
