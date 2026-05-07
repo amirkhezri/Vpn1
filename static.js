@@ -123,41 +123,57 @@ zh: {
 };
 
 // --- Tariffs with Stars pricing ---
-// 1 Star ≈ 0.013 USD ≈ ~1.3 RUB (approximate)
+// 1 Star ≈ 0.013 USD | 85000 Star ≈ 1 USD  (approximate)
+
+const TOMAN_RATE = 85000;
+const STAR_USD_RATE = 0.013;
+
+function getStars(price){
+    return Math.ceil(price / STAR_USD_RATE);
+}
+
+function getToman(price){
+    return Math.round(price * TOMAN_RATE);
+}
+
 // Adjust STARS_PER_MONTH to your real rate
 const TARIFFS = [
     {
         id: 'month_1',
+        type: 'monthly',
         months: 1,
         price: 103.10,
-        stars: 80,
+        methods: ['stars', 'crypto'],
         badge: null,
         discountPct: 0,
         features: ['Безлимитный трафик', 'VLESS протокол', 'Поддержка 24/7']
     },
     {
         id: 'month_3',
+        type: 'monthly',
         months: 3,
         price: 279.00,
-        stars: 215,
+        methods: ['stars', 'crypto'],
         badge: 'save',        // Popular
         discountPct: 10,
         features: ['Безлимитный трафик', 'VLESS протокол', 'Поддержка 24/7', '10% скидка']
     },
     {
         id: 'month_6',
+        type: 'monthly',
         months: 6,
         price: 495.00,
-        stars: 380,
+        methods: ['stars', 'crypto'],
         badge: null,
         discountPct: 20,
         features: ['Безлимитный трафик', 'VLESS протокол', 'Поддержка 24/7', '20% скидка']
     },
     {
         id: 'month_12',
+        type: 'monthly',
         months: 12,
         price: 825.00,
-        stars: 635,
+        methods: ['stars', 'crypto'],
         badge: 'best',        // Best price
         discountPct: 33,
         features: ['Безлимитный трафик', 'VLESS протокол', 'Поддержка 24/7', 'Приоритетная поддержка', '33% скидка']
