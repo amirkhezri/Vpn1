@@ -1137,6 +1137,14 @@
                 // ساخت اطلاعات پرداخت
                 await reInitCrypto();
 
+                const expired = document.getElementById("expired");
+                const content = document.getElementById("content");
+                const infoBox = document.getElementById("payment-info-box");
+
+                if (expired) expired.style.display = "none";
+                if (content) content.style.display = "block";
+                if (infoBox) infoBox.style.display = "block";
+
                 // نمایش overlay
                 document.getElementById("crypto-overlay").style.display = "flex";
                 
