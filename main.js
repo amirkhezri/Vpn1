@@ -309,7 +309,7 @@ function closeModal() {
 }
 
 window.showPaymentModal = (months, price, stars) => {
-    if (telegramId === 'DEV_USER') return showToast('Откройте в Telegram', 'error');
+    
     currentModalTariff = { months, price, stars };
 
     const comment = `Pay_${months}m_${telegramId}`;
@@ -425,7 +425,7 @@ function renderTariffs() {
                 ${oldPrice}
                 <div class="tariff-price">${tariff.price.toFixed(0)} <span class="tariff-currency">$</span></div>
                 <div class="tariff-per-month">${pricePerMonth} $/мес</div>
-                <div class="tariff-stars-price">⭐ ${tariff.stars} Stars</div>
+                <div class="tariff-stars-price">⭐ ${getStars(tariff.price)} Stars</div>
             </div>
             <ul class="tariff-features">
                 ${tariff.features.map(f => `<li><i class="fas fa-check"></i> ${f}</li>`).join('')}
@@ -433,7 +433,7 @@ function renderTariffs() {
             <button class="btn btn-tariff tariff-btn-delegate"
                 data-months="${tariff.months}"
                 data-price="${tariff.price}"
-                data-stars="${tariff.stars}">
+                data-stars="${getStars(tariff.price)}">
                 <i class="fas fa-bolt"></i> Выбрать
             </button>
         </div>`;
