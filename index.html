@@ -1079,36 +1079,13 @@
             }
 
             async function loadRates() {
-                try {
-                // گرفتن همزمان
-                const [tonRes, usdtRes] = await Promise.all([
-                fetch("https://api.binance.com/api/v3/ticker/price?symbol=TONUSDT"),
-                fetch("https://api.binance.com/api/v3/ticker/price?symbol=USDCUSDT")
-                ]);
 
-                const tonData = await tonRes.json();
-                const usdtData = await usdtRes.json();
-
-                const tonPriceInUSDT = parseFloat(tonData.price);
-                const usdtPriceInUSD = parseFloat(usdtData.price);
-
-                // تبدیل TON → USD
-                const tonPriceInUSD = tonPriceInUSDT * usdtPriceInUSD;
-
-                CRYPTO_STATE.rates = {
-                    USDT: usdtPriceInUSD,
-                    Toncoin: tonPriceInUSD
-                };
-
-                } catch (e) {
-                console.error("Binance fetch failed", e);
-
-                // fallback
+                // نسبت نرخ USDT/TONCOIN
                 CRYPTO_STATE.rates = {
                     USDT: 1,
                     Toncoin: 5
                 };
-                }
+                
             }
 
             // ساخت اطلاعات پرداخت و بارگذاری ارز و شبکه
@@ -1130,6 +1107,11 @@
             // باز کردن پاپ آپ پرداخت و ساخت اطلاعات پرداخت
             
             window.openCryptoPayment = async function(price, telegramId) {
+
+                // جلوگیری از ورود خارج از تلگرام برای پرداخت کریپتو
+
+                if (telegramId === 'DEV_USER') return showToast('Для оплаты Crypto Currency откройте Telegram', 'error');
+
 
                 CRYPTO_STATE.priceUSD = price;
                 CRYPTO_STATE.telegramId = telegramId;
