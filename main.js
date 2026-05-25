@@ -23,7 +23,7 @@ const CARD_INFO = {
 
 const BOT_USERNAME = 'ToniVpn_Global_bot';
 const TRIAL_DAYS = 3;
-let API_BASE = localStorage.getItem('shinobu_api_base') || 'https://toni-vpn.onrender.com/api';
+let API_BASE = localStorage.getItem('shinobu_api_base') || 'https://tonivpn.xyz/api';
 
 // --- Firebase Mock (API wrapper) ---
 window.firestore = {
