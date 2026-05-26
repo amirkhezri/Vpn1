@@ -586,7 +586,7 @@ def telegram_webhook():
         except Exception as e:
             log.warning("Failed to answer callback: %s", e)
 
-        user_langs[tg_id] = lang
+        #user_langs[tg_id] = lang
 
         texts = {
             "en": (
