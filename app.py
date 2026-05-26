@@ -753,14 +753,14 @@ def telegram_webhook():
         username  = from_user.get("username", "")
         firstname = from_user.get("first_name", "")
 
-            db = get_db()
-            db_insert_ignore(
-                db,
-                table="users",
-                columns=["user_id", "telegram_id", "username", "first_name"],
-                values=[tg_id, tg_id, username, firstname],
-                conflict_col="user_id",
-            )
+        db = get_db()
+        db_insert_ignore(
+            db,
+            table="users",
+            columns=["user_id", "telegram_id", "username", "first_name"],
+            values=[tg_id, tg_id, username, firstname],
+            conflict_col="user_id",
+        )
 
 
 
