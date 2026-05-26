@@ -567,7 +567,7 @@ def telegram_webhook():
             requests.post(
                 f"https://api.telegram.org/bot{BOT_TOKEN}/deleteMessage",
                 json={
-                    "chat_id": callback["message"]["chat"]["id"],
+                    "chat_id": tg_id,
                     "message_id": callback["message"]["message_id"]
                 },
                 timeout=2
