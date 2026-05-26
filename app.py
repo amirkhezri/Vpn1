@@ -732,7 +732,7 @@ def telegram_webhook():
 
     # ── /start с рефералом ────────────────────────────────────────
     text = message.get("text", "")
-    if text.startswith("/start"):{
+    if text.startswith("/start"):
 
         parts = text.split()
         from_user = message.get("from", {})
@@ -764,7 +764,6 @@ def telegram_webhook():
 
         db.commit()
 
-    }
     
 
     requests.post(
