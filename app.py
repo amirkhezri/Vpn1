@@ -562,18 +562,6 @@ def telegram_webhook():
         tg_id = str(callback["from"]["id"])
         lang = callback["data"].replace("lang_", "")
 
-        # حذف پیام انتخاب زبان
-        try:
-            requests.post(
-                f"https://api.telegram.org/bot{BOT_TOKEN}/deleteMessage",
-                json={
-                    "chat_id": tg_id,
-                    "message_id": callback["message"]["message_id"]
-                },
-                timeout=2
-            )
-        except Exception as e:
-            log.warning("Failed to delete language message: %s", e)
 
         try:
             requests.post(
@@ -588,6 +576,19 @@ def telegram_webhook():
 
 
         user_langs[tg_id] = lang
+      
+        # حذف پیام انتخاب زبان
+        try:
+            requests.post(
+                f"https://api.telegram.org/bot{BOT_TOKEN}/deleteMessage",
+                json={
+                    "chat_id": tg_id,
+                    "message_id": callback["message"]["message_id"]
+                },
+                timeout=2
+            )
+        except Exception as e:
+            log.warning("Failed to delete language message: %s", e)
 
         texts = {
             "en": (
