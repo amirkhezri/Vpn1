@@ -583,12 +583,12 @@ def telegram_webhook():
 
 
         try:
-            async_post(
+            requests.post(
                 f"https://api.telegram.org/bot{BOT_TOKEN}/answerCallbackQuery",
-                {
+                json={
                     "callback_query_id": callback["id"]
-                }
-
+                },
+                timeout=3
             )
         except Exception as e:
             log.warning("Failed to answer callback: %s", e)
