@@ -673,7 +673,7 @@ def telegram_webhook():
         tg_id = str(from_user.get("id", ""))
 
         # send language selector in background
-        async_send(
+        requests.post(
             f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
             {
                 "chat_id": tg_id,
