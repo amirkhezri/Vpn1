@@ -655,7 +655,9 @@ def telegram_webhook():
     text = message.get("text", "")
     if text.startswith("/start"):
 
-        tg_id = str(message["from"]["id"])
+        from_user = message.get("from", {})
+
+        tg_id     = str(from_user.get("id", ""))
 
         requests.post(
             f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
