@@ -550,12 +550,6 @@ def telegram_webhook():
     
 
     update = request.get_json(force=True) or {}
-    message = update.get("message")
-    
-    if not message:
-        return jsonify({"ok": True})
-
-    text = message.get("text", "")
 
 
     # ── Language selection callback ─────────────────────────
@@ -653,6 +647,12 @@ def telegram_webhook():
 
     # ── /start с рефералом ────────────────────────────────────────
 
+    message = update.get("message")
+    
+    if not message:
+        return jsonify({"ok": True})
+
+    text = message.get("text", "")
     if text.startswith("/start"):
 
         tg_id = str(message["from"]["id"])
