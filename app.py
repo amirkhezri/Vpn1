@@ -574,8 +574,6 @@ def telegram_webhook():
 
         user_langs[tg_id] = lang
 
-        return jsonify({"ok": True})
-
         texts = {
             "en": (
                 "🚀 Enjoy borderless internet with Toni Vpn\n\n"
