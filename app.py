@@ -752,7 +752,7 @@ def telegram_webhook():
                     ]
                 }
             },
-            timeout=3
+            timeout=5
         )
 
     return jsonify({"ok": True})
