@@ -735,56 +735,22 @@ def telegram_webhook():
     text = message.get("text", "")
     if text.startswith("/start"):
 
-        parts = text.split()
+    tg_id = str(message["from"]["id"])
 
-        from_user = message.get("from", {})
-
-        tg_id     = str(from_user.get("id", ""))
-        username  = from_user.get("username", "")
-        firstname = from_user.get("first_name", "")
-
-        db = get_db()
-        db_insert_ignore(
-            db,
-            table="users",
-            columns=["user_id", "telegram_id", "username", "first_name"],
-            values=[tg_id, tg_id, username, firstname],
-            conflict_col="user_id",
-        )
-
-
-
-        # Записать реферала
-        if len(parts) > 1 and parts[1].startswith("ref_"):
-            ref_id = parts[1][4:]
-            if ref_id != tg_id:
-                existing = db_fetchone(db, "SELECT referred_by FROM users WHERE user_id=?", (tg_id,))
-
-            if existing and not existing["referred_by"]:
-                db_execute(db, "UPDATE users SET referred_by=? WHERE user_id=?", (ref_id, tg_id))
-
-
-        db.commit()
-
-    
-    
-
-        requests.post(
-            f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
-            json={
-                "chat_id": tg_id,
-                "text": "🌍 Choose language:",
-                "reply_markup": {
-                    "inline_keyboard": [
-                        [{"text": "🇬🇧 English", "callback_data": "lang_en"}],
-                        [{"text": "🇷🇺 Русский", "callback_data": "lang_ru"}],
-                        [{"text": "🇨🇳 中文", "callback_data": "lang_zh"}],
-                        [{"text": "🇮🇷 فارسی", "callback_data": "lang_fa"}]
-                    ]
-                }
-            },
-            timeout=5
-        )
+    requests.post(
+        f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+        json={
+            "chat_id": tg_id,
+            "text": "🌍 Choose language:",
+            "reply_markup": {
+                "inline_keyboard": [
+                    [{"text": "🇬🇧 English", "callback_data": "lang_en"}],
+                    [{"text": "🇮🇷 فارسی", "callback_data": "lang_fa"}]
+                ]
+            }
+        },
+        timeout=3
+    )
 
     return jsonify({"ok": True})
 
