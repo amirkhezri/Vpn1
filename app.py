@@ -675,7 +675,7 @@ def telegram_webhook():
         # send language selector in background
         requests.post(
             f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
-            {
+            json={
                 "chat_id": tg_id,
                 "text": "🌍 Choose language:",
                 "reply_markup": {
@@ -686,7 +686,8 @@ def telegram_webhook():
                         [{"text": "🇮🇷 فارسی", "callback_data": "lang_fa"}]
                     ]
                 }
-            }
+            },
+            timeout=1.5
         )
 
     return jsonify({"ok": True})
