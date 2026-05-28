@@ -350,7 +350,7 @@ window.addEventListener('click', (e) => {
         lockAction(async () => {
             const link = document.getElementById('referral-link-display').textContent;
             if (tg?.openTelegramLink) {
-                tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent('Попробуй Toni VPN! 🔥')}`);
+                tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent('Toni VPN! 🔥')}`);
             } else {
                 await copyText(link, TRANSLATIONS[currentLang].link_copied);
             }
