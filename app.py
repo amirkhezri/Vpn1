@@ -40,18 +40,7 @@ REFERRAL_BONUS = int(os.getenv("REFERRAL_BONUS", 10))  # дней за рефе�
 
 user_langs = {}
 
-def async_send(url, payload):
-    def run():
-        try:
-            requests.post(
-                url,
-                json=payload,
-                timeout=1.5
-            )
-        except Exception as e:
-            print("Telegram async error:", e)
 
-    Thread(target=run, daemon=True).start()
 
 def is_postgres_enabled() -> bool:
     return DATABASE_URL.startswith("postgres://") or DATABASE_URL.startswith("postgresql://")
@@ -77,6 +66,21 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 log = logging.getLogger(__name__)
 
 setup_database()
+
+#####
+
+def async_send(url, payload):
+    def run():
+        try:
+            requests.post(
+                url,
+                json=payload,
+                timeout=1.5
+            )
+        except Exception as e:
+            print("Telegram async error:", e)
+
+    Thread(target=run, daemon=True).start()
 
 
 # ─── Database ──────────────────────────────────────────────────────────────────
@@ -687,7 +691,7 @@ def telegram_webhook():
                     ]
                 }
             },
-            timeout=1.5
+            timeout=3
         )
 
     return jsonify({"ok": True})
