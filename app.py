@@ -677,7 +677,7 @@ def telegram_webhook():
                     "text": "🌍 Choose language:",
                     "reply_markup": {
                         "inline_keyboard": [
-                            [{"text": "🇬🇧 English", "callback_data": "lang_en"}],
+                            [{"text": "🇺🇸 English", "callback_data": "lang_en"}],
                             [{"text": "🇷🇺 Русский", "callback_data": "lang_ru"}],
                             [{"text": "🇨🇳 中文", "callback_data": "lang_zh"}],
                             [{"text": "🇮🇷 فارسی", "callback_data": "lang_fa"}]
