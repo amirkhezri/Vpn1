@@ -308,10 +308,10 @@ const TARIFFS = [
 ];
 
 const DOWNLOAD_LINKS = {
-    android: { name: 'Android', icon: 'fab fa-android', url: 'https://github.com/v2fly/v2rayNG/releases' },
-    ios:     { name: 'iOS (V2RayTun)', icon: 'fab fa-apple', url: 'https://apps.apple.com/app/v2raytun/id6444857502' },
-    windows: { name: 'Windows (Hiddify)', icon: 'fab fa-windows', url: 'https://hiddify.com/download' },
-    mac:     { name: 'macOS', icon: 'fab fa-apple', url: 'https://github.com/v2rayA/v2rayA/releases' },
+    android: { name: 'Android', icon: 'fab fa-android', url: 'https://play.google.com/store/apps/details?id=com.v2raytun.android' },
+    ios:     { name: 'iOS (V2RayTun)', icon: 'fab fa-apple', url: 'https://apps.apple.com/us/app/v2raytun/id6476628951' },
+    windows: { name: 'Windows (V2RayN)', icon: 'fab fa-windows', url: 'https://v2rayn-g.com/#Download' },
+    mac:     { name: 'macOS', icon: 'fab fa-apple', url: 'https://apps.apple.com/us/app/v2raytun/id6476628951' },
 };
 
 const INSTRUCTION_LINKS = {
