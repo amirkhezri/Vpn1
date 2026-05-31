@@ -573,7 +573,7 @@ def telegram_webhook():
                 json={
                     "callback_query_id": callback["id"]
                 },
-                timeout=(15, 5)
+                timeout=(5, 1.5)
             )
         except Exception as e:
             log.error("Callback ACK error: %s", e)
@@ -644,7 +644,7 @@ def telegram_webhook():
                         ]]
                     }
                 },
-                timeout=(15, 5)
+                timeout=(5, 1.5)
             )
         except Exception as e:
             log.error("Callback send wellcom error: %s", e)
@@ -684,7 +684,7 @@ def telegram_webhook():
                         ]
                     }
                 },
-                timeout=(15, 5)
+                timeout=(5, 1.5)
             )
         except Exception as e:
             log.error("Callback send lang button error %s:", e)
