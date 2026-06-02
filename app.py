@@ -626,6 +626,20 @@ def telegram_webhook():
             )
         }
 
+        # delete language selector message
+        try:
+            session.post(
+                f"https://api.telegram.org/bot{BOT_TOKEN}/deleteMessage",
+                json={
+                    "chat_id": tg_id,
+                    "message_id": callback["message"]["message_id"]
+                },
+                timeout=(2, 1.5)
+            )
+        except Exception as e:
+            log.warning("Delete language message error: %s", e)
+  
+
         # sendMessage in background
         try:
             session.post(
