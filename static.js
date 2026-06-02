@@ -106,7 +106,7 @@ const TRANSLATIONS = {
         title_status: "وضعیت شما", balance_label: "موجودی:", status_label: "وضعیت:",
         expiry_label: "انقضا:", loading: "در حال بارگذاری", loading_key: "کلید پس از فعال‌سازی نمایش داده می‌شود", copy_btn: "کپی",
         title_trial: "دوره آزمایشی", title_tariffs: "طرح ها",
-        billing_subtitle: "طرح های زیر بدون محدودیت ترافیک ( بر اساس مدت زمان ) و فقط مناسب اینترنت بین الملل هستند",
+        billing_subtitle: "طرح های زیر بدون محدودیت ترافیک ( بر اساس مدت زمان ) و مناسب اینترنت بین الملل هستند",
         billing_subtitle2: "یک طرح را انتخاب کنید — پرداخت با ستاره های تلگرام ⭐ یا ارز دیجیتال",
         pm_title: "روش‌های پرداخت",
         payment_warning: "ستاره های تلگرام: فعال‌سازی حداکثر تا ۵ دقیقه از طریق ربات | ارز دیجیتال: تحویل فوری کلید",
@@ -131,7 +131,7 @@ const TRANSLATIONS = {
         days_left: "روز باقی‌مانده:",
         stars_paid_success: "پرداخت ستاره موفق بود! در حال دریافت کلید...",
         stars_paid_error: "پرداخت ستاره ناموفق بود. دوباره تلاش کنید.",
-        global_plans: "مناسب اینترنت جهانی", iranian_plans: " فقط مخصوص نت ملی ایران ",
+        global_plans: "مناسب اینترنت جهانی", iranian_plans: " مناسب اینترنت ایران ",
         methods_stars: " ستاره های تلگرام", methods_crypto: " ارز دیجیتال",
         info_time: "مدت زمان", info_crypto: "مبلغ ارز دیجیتال", info_stars: "مبلغ ستاره",
         dollar_mon: "$/ماه",
@@ -205,7 +205,7 @@ const TRANSLATIONS = {
 // --- Tariffs with Stars pricing ---
 // 1 Star ≈ 0.013 USD | 85000 Star ≈ 1 USD  (approximate)
 
-const TOMAN_RATE = 177810;
+const TOMAN_RATE = 173710;
 const STAR_USD_RATE = 0.011;
 
 function getStars(price){
@@ -214,6 +214,10 @@ function getStars(price){
 
 function getToman(price){
     return Math.round((price * TOMAN_RATE) / 1000) * 1000;
+}
+
+function getTomanGB(price){
+    return Math.round(price * TOMAN_RATE);
 }
 
 // Adjust STARS_PER_MONTH to your real rate
@@ -267,42 +271,42 @@ const TARIFFS = [
     {
         id: 'volume_3',
         type: 'volume',
-        gig: 3,
-        price: 1.99,
+        gig: 30,
+        price: 1.72,
         methods: ['stars', 'crypto', 'card'],
         badge: null,
         discountPct: 0,
-        features: ['بدون محدودیت زمانی', 'فقط مخصوص نت ملی ایران', 'VLESS پروتکل', 'پشتیبانی 24/7', 'تک کاربره']
+        features: ['بدون محدودیت زمانی', 'مناسب اینترنت ایران', 'VLESS پروتکل', 'پشتیبانی 24/7', 'تک کاربره']
     },
     {
         id: 'volume_5',
         type: 'volume',
-        gig: 5,
-        price: 2.98,
+        gig: 60,
+        price: 3.09,
         methods: ['stars', 'crypto', 'card'],
         badge: 'save',        // Popular
         discountPct: 10,
-        features: ['بدون محدودیت زمانی', 'فقط مخصوص نت ملی ایران', 'VLESS پروتکل', 'پشتیبانی 24/7', 'تخفیف %10', 'دو کاربره']
+        features: ['بدون محدودیت زمانی', 'مناسب اینترنت ایران', 'VLESS پروتکل', 'پشتیبانی 24/7', 'تخفیف %10', 'دو کاربره']
     },
     {
         id: 'volume_10',
         type: 'volume',
-        gig: 10,
-        price: 5.31,
+        gig: 150,
+        price: 6.88,
         methods: ['stars', 'crypto', 'card'],
         badge: null,
         discountPct: 20,
-        features: ['بدون محدودیت زمانی', 'فقط مخصوص نت ملی ایران', 'VLESS پروتکل', 'پشتیبانی 24/7', '20% تخفیف', 'چهار کاربره']
+        features: ['بدون محدودیت زمانی', 'مناسب اینترنت ایران', 'VLESS پروتکل', 'پشتیبانی 24/7', '20% تخفیف', 'چهار کاربره']
     },
     {
         id: 'volume_20',
         type: 'volume',
-        gig: 20,
-        price: 8.88,
+        gig: 300,
+        price: 11.50,
         methods: ['stars', 'crypto', 'card'],
         badge: 'best',        // Best price
         discountPct: 33,
-        features: ['بدون محدودیت زمانی', 'فقط مخصوص نت ملی ایران', 'VLESS پروتکل', 'پشتیبانی 24/7', 'پشتیبانی اولویت دار', '33% تخفیف', 'چهار کاربره']
+        features: ['بدون محدودیت زمانی', 'مناسب اینترنت ایران', 'VLESS پروتکل', 'پشتیبانی 24/7', 'پشتیبانی اولویت دار', '33% تخفیف', 'شش کاربره']
     }
 
 ];
