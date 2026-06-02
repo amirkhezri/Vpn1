@@ -814,6 +814,10 @@ function renderTariffs() {
 
         const displayValue = isMonthly
         ? tariff.months
+        : tariff.gig;
+
+        const displayValuetitle = isMonthly
+        ? tariff.months
         : `<span class="tariff-gig">${tariff.gig}</span>`;
 
         const displayLabel = isMonthly
@@ -914,7 +918,7 @@ function renderTariffs() {
         <div class="tariff-card ${tariff.badge ? 'tariff-card-featured' : ''}">
             ${badgeHtml}
             <div class="tariff-period">
-                <span class="tariff-months">${displayValue}</span>
+                <span class="tariff-months">${displayValuetitle}</span>
                 <span class="tariff-month-label">${displayLabel}</span>
                 ${discountHtml}
             </div>
