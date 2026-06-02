@@ -762,7 +762,7 @@ function updatePlansUI() {
     } else {
 
         subtitle.innerHTML =
-        'طرح های زیر بدون محدودیت زمانی ( بر اساس مقدار ترافیک ) و <b>مخصوص شرایط نت ملی ایران</b> هستند';
+        'طرح های زیر بدون محدودیت زمانی ( بر اساس مقدار ترافیک ) و <b>مناسب شرایط فعلی اینترنت ایران</b> هستند';
 
         subtitle2.innerHTML =
         'یک طرح را انتخاب کنید — پرداخت با ⭐ ستاره های تلگرام ، <i class="fas fa-coins"></i> ارز دیجیتال یا <i class="fas fa-credit-card"></i> کارت به کارت';
@@ -824,7 +824,7 @@ function renderTariffs() {
 
         const unitPrice = isMonthly
         ? (tariff.price / tariff.months).toFixed(2)
-        : (tariff.price / tariff.gig).toFixed(2);
+        : `${getTomanGB(tariff.price / tariff.gig).toLocaleString()}`;
 
         let badgeText = '';
         if (tariff.badge) {
@@ -862,11 +862,11 @@ function renderTariffs() {
 
         } else {
 
-            if (tariff.gig > 3) {
+            if (tariff.gig > 30) {
 
                 oldPrice = `
                 <span class="tariff-old-price" style="direction:rtl; text-align:left;">
-                        ${getToman((basePrice1v / 3) * tariff.gig).toFixed(0)} تومان
+                        ${getToman((basePrice1v / 30) * tariff.gig).toFixed(0)} تومان
                         </span>
                 `;
             }
@@ -932,7 +932,7 @@ function renderTariffs() {
                 <div class="tariff-price">${tariff.price.toFixed(2)} <span class="tariff-currency">$</span></div>
                 <div class="tariff-per-month">
                 ${unitPrice}
-                ${isMonthly ? t.dollar_mon : '$/GB'}
+                ${isMonthly ? t.dollar_mon : 'تومان/GB'}
                 </div>
                 <div class="tariff-stars-price">⭐ ${getStars(tariff.price)} Stars</div>
             </div>
