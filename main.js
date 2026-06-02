@@ -814,7 +814,7 @@ function renderTariffs() {
 
         const displayValue = isMonthly
         ? tariff.months
-        : tariff.gig;
+        : `<span class="tariff-gig">${tariff.gig}</span>`;
 
         const displayLabel = isMonthly
         ? (tariff.months === 1 ? t.month_1 : t.month_many)
