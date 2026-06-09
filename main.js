@@ -218,7 +218,7 @@ window.addEventListener('load', () => {
     renderInstructionButtons();
     generateReferralLink();
     window.startSubscriptionListener();
-    switchTab('profile');
+    switchTab('billing');
 
     // Animate entrance
     document.querySelector('.container').classList.add('loaded');
