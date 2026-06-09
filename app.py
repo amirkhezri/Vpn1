@@ -699,7 +699,7 @@ def telegram_webhook():
                         ]
                     }
                 },
-                timeout=(1.5, 5)
+                timeout=(1.5, 1.5)
             )
         except Exception as e:
             log.error("Callback send lang button error %s:", e)
