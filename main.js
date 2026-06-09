@@ -104,12 +104,6 @@ window.addEventListener('load', () => {
         currentLang = 'en';
     }
 
-    if (currentLang === 'fa') {
-        currentPlansView = 'volume';
-    } else {
-        currentPlansView = 'monthly';
-    }
-
     // sync localStorage
     localStorage.setItem('lang', currentLang);
 
@@ -219,6 +213,12 @@ window.addEventListener('load', () => {
 
 
     });
+
+    if (currentLang === 'fa') {
+        volumeToggle.click();
+    } else {
+        monthlyToggle.click();
+    }
     
     renderDownloadButtons();
     renderInstructionButtons();
