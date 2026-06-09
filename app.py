@@ -573,7 +573,7 @@ def telegram_webhook():
                 json={
                     "callback_query_id": callback["id"]
                 },
-                timeout=(2, 1.5)
+                timeout=(1, 1.5)
             )
         except Exception as e:
             log.error("Callback ACK error: %s", e)
@@ -635,7 +635,7 @@ def telegram_webhook():
                     "chat_id": tg_id,
                     "message_id": callback["message"]["message_id"]
                 },
-                timeout=(2, 1.5)
+                timeout=(1, 1.5)
             )
         except Exception as e:
             log.warning("Delete language message error: %s", e)
@@ -659,7 +659,7 @@ def telegram_webhook():
                         ]]
                     }
                 },
-                timeout=(2, 1.5)
+                timeout=(1, 1.5)
             )
         except Exception as e:
             log.error("Callback send wellcom error: %s", e)
@@ -699,7 +699,7 @@ def telegram_webhook():
                         ]
                     }
                 },
-                timeout=(2, 1.5)
+                timeout=(1, 1.5)
             )
         except Exception as e:
             log.error("Callback send lang button error %s:", e)
