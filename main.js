@@ -214,12 +214,6 @@ window.addEventListener('load', () => {
 
     });
 
-    if (currentLang === 'fa') {
-        volumeToggle.click();
-    } else {
-        monthlyToggle.click();
-    }
-    
     renderDownloadButtons();
     renderInstructionButtons();
     generateReferralLink();
@@ -476,11 +470,19 @@ function switchTab(targetId) {
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     document.querySelector(`.nav-btn[data-target="${targetId}"]`)?.classList.add('active');
 
-    currentPlansView = 'monthly';
+    
+    if (currentLang === 'fa') {
+        currentPlansView = 'volume';
 
-    document.getElementById('monthly-toggle')?.classList.add('active');
-    document.getElementById('volume-toggle')?.classList.remove('active');
+        document.getElementById('volume-toggle')?.classList.add('active');
+        document.getElementById('monthly-toggle')?.classList.remove('active');
+    } else {
+        currentPlansView = 'monthly';
 
+        document.getElementById('monthly-toggle')?.classList.add('active');
+        document.getElementById('volume-toggle')?.classList.remove('active');
+    }
+    
     updateLanguageToggleState();
     updatePlansUI();
     renderTariffs();
