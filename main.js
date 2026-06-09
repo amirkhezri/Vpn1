@@ -104,6 +104,12 @@ window.addEventListener('load', () => {
         currentLang = 'en';
     }
 
+    if (currentLang === 'fa') {
+        currentPlansView = 'volume';
+    } else {
+        currentPlansView = 'monthly';
+    }
+
     // sync localStorage
     localStorage.setItem('lang', currentLang);
 
