@@ -271,7 +271,7 @@ const TARIFFS = [
     {
         id: 'volume_3',
         type: 'volume',
-        gig: 30,
+        gig: 50,
         price: 1.72,
         methods: ['stars', 'crypto', 'card'],
         badge: null,
@@ -281,7 +281,7 @@ const TARIFFS = [
     {
         id: 'volume_5',
         type: 'volume',
-        gig: 60,
+        gig: 100,
         price: 3.09,
         methods: ['stars', 'crypto', 'card'],
         badge: 'save',        // Popular
@@ -291,7 +291,7 @@ const TARIFFS = [
     {
         id: 'volume_10',
         type: 'volume',
-        gig: 150,
+        gig: 300,
         price: 6.88,
         methods: ['stars', 'crypto', 'card'],
         badge: null,
@@ -301,7 +301,7 @@ const TARIFFS = [
     {
         id: 'volume_20',
         type: 'volume',
-        gig: 300,
+        gig: 600,
         price: 11.50,
         methods: ['stars', 'crypto', 'card'],
         badge: 'best',        // Best price
